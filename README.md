@@ -1,2 +1,2 @@
 # Hal9000
-Discord bot
+Discord bot with movie and tv show trivia
