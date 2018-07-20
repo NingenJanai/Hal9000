@@ -42,6 +42,8 @@ bot.on('ready', function (evt) {
 });
 
 bot.on('message', function (user, userID, channelID, message, evt) {
+    console.log(channelID);
+
     // Our bot needs to know if it will execute a command. It will listen for messages that will start with `!`
     if (message.substring(0, 1) == '!') {
         var args = message.substring(1).split(' ');
@@ -51,60 +53,62 @@ bot.on('message', function (user, userID, channelID, message, evt) {
 
         let elapsed = (timestamp - Date.now() / 1000);
 
-        switch (cmd) {
-            case 'help':
-                bot.sendMessage({
-                    to: channelID,
-                    message: `Use **!trivia** or **!trivia [category]** to start a new trivia question *(categories: tv / movies)*.
+        if (auth.triviaChannelID == channelID) {
+            switch (cmd) {
+                case 'help':
+                    bot.sendMessage({
+                        to: channelID,
+                        message: `Use **!trivia** or **!trivia [category]** to start a new trivia question *(categories: tv / movies)*.
 After the category is set **!trivia** will remember the last category.
 Use **!answer [number]** to answer and **!stats** to see the current scores.
 **!trivia** command can only be used every 10 seconds.`
-                });
-                break;
-            case 'trivia':
-                if (args.length == 1)
-                    trivia.setCategory(args[0].toLowerCase() == 'tv' ? trivia.TV : trivia.MOVIES);
-                
-                trivia.getQuestion(channelID);
+                    });
+                    break;
+                case 'trivia':
+                    if (args.length == 1)
+                        trivia.setCategory(args[0].toLowerCase() == 'tv' ? trivia.TV : trivia.MOVIES);
 
-                break;
-            case 'answer':
-                if (!question) {
-                    // TODO: Check last trivia time
-                    /*bot.sendMessage({
-                        to: channelID,
-                        message: `Currently there's no trivia running. Use !trivia to start a new one`
-                    });*/
-                } else if (args.length == 1) {
-                    if (question && args[0] == question.correct_number) {
-                        stats.addPoints(user, userID, 1);
+                    trivia.getQuestion(channelID);
 
-                        bot.sendMessage({
+                    break;
+                case 'answer':
+                    if (!question) {
+                        // TODO: Check last trivia time
+                        /*bot.sendMessage({
                             to: channelID,
-                            message: `Congratulations <@${userID}>. Your answer is **correct**!`
-                        });
+                            message: `Currently there's no trivia running. Use !trivia to start a new one`
+                        });*/
+                    } else if (args.length == 1) {
+                        if (question && args[0] == question.correct_number) {
+                            stats.addPoints(user, userID, 1);
 
-                        question = undefined;
-                    } else {
-                        stats.addPoints(user, userID, 0);
+                            bot.sendMessage({
+                                to: channelID,
+                                message: `Congratulations <@${userID}>. Your answer is **correct**!`
+                            });
 
-                        bot.sendMessage({
-                            to: channelID,
-                            message: `Sorry <@${userID}>. Your answer is **wrong**`
-                        });
+                            question = undefined;
+                        } else {
+                            stats.addPoints(user, userID, 0);
+
+                            bot.sendMessage({
+                                to: channelID,
+                                message: `Sorry <@${userID}>. Your answer is **wrong**`
+                            });
+                        }
                     }
-                }
-                break;
-            case 'stats':
+                    break;
+                case 'stats':
 
-                // TODO: Show which users have guessed more right or wrong answers
+                    // TODO: Show which users have guessed more right or wrong answers
 
-                bot.sendMessage({
-                    to: channelID,
-                    message: stats.text()
-                });
-                break;
-            // Just add any case commands if you want to..
+                    bot.sendMessage({
+                        to: channelID,
+                        message: stats.text()
+                    });
+                    break;
+                // Just add any case commands if you want to..
+            }
         }
     }
 });
