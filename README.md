@@ -7,6 +7,7 @@ In order to run this project, you will need to create an auth.json file in the r
 
 ```
 {
-   "token": "YOUR-BOT-TOKEN"
+   "token": "YOUR-BOT-TOKEN",
+   "triviaChannelID" :"ID-OF-THE-CHANNEL-FOR-TRIVIA"
 }
 ```
