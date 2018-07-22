@@ -42,6 +42,7 @@ function retrieveConfigMap() {
   });
 }
 
+
 retrieveConfigMap().then(config => {
         // Initialize Discord Bot
         var bot = new Discord.Client({
@@ -136,4 +137,5 @@ Use **!answer [number]** to answer and **!stats** to see the current scores.
             }
         });
 
+    
 });
