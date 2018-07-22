@@ -26,6 +26,7 @@ logger.add(new logger.transports.Console, {
 var question = undefined;
 var timestamp = Date.now();
 
+const jsyaml = require('js-yaml');
 const openshiftRestClient = require('openshift-rest-client');
 function retrieveConfigMap() {
   const settings = {
