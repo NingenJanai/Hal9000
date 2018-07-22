@@ -44,7 +44,7 @@ function retrieveConfigMap() {
 }
 
 console.log(process.env.triviaChannelID, process.end);
-
+/*
 //retrieveConfigMap().then(config => {
         // Initialize Discord Bot
         var bot = new Discord.Client({
@@ -100,10 +100,10 @@ Use **!answer [number]** to answer and **!stats** to see the current scores.
                         case 'answer':
                             if (!question) {
                                 // TODO: Check last trivia time
-                                /*bot.sendMessage({
-                                    to: channelID,
-                                    message: `Currently there's no trivia running. Use !trivia to start a new one`
-                                });*/
+                                //bot.sendMessage({
+                                //    to: channelID,
+                                //    message: `Currently there's no trivia running. Use !trivia to start a new one`
+                                //});
                             } else if (args.length == 1) {
                                 if (question && args[0] == question.correct_number) {
                                     stats.addPoints(user, userID, 1);
@@ -141,3 +141,4 @@ Use **!answer [number]** to answer and **!stats** to see the current scores.
 
     
 //});
+*/
