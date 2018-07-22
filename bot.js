@@ -26,27 +26,7 @@ logger.add(new logger.transports.Console, {
 var question = undefined;
 var timestamp = Date.now();
 
-const jsyaml = require('js-yaml');
-const openshiftRestClient = require('openshift-rest-client');
-function retrieveConfigMap() {
-  const settings = {
-    request: {
-      strictSSL: false
-    }
-  };
-
-  return openshiftRestClient(settings).then(client => {
-    const configMapName = 'bot-config';
-    return client.configmaps.find(configMapName).then(configMap => {
-      return jsyaml.safeLoad(configMap.data['bot-config.yml']);
-    });
-  });
-}
-
-console.log(process.env.triviaChannelID, process.end);
-/*
-//retrieveConfigMap().then(config => {
-        // Initialize Discord Bot
+// Initialize Discord Bot
         var bot = new Discord.Client({
             token: process.env.token,
             autorun: true
@@ -138,6 +118,28 @@ Use **!answer [number]** to answer and **!stats** to see the current scores.
                 }
             }
         });
+
+/*const jsyaml = require('js-yaml');
+const openshiftRestClient = require('openshift-rest-client');
+function retrieveConfigMap() {
+  const settings = {
+    request: {
+      strictSSL: false
+    }
+  };
+
+  return openshiftRestClient(settings).then(client => {
+    const configMapName = 'bot-config';
+    return client.configmaps.find(configMapName).then(configMap => {
+      return jsyaml.safeLoad(configMap.data['bot-config.yml']);
+    });
+  });
+}
+
+console.log(process.env.triviaChannelID, process.end);*/
+/*
+//retrieveConfigMap().then(config => {
+        
 
     
 //});
