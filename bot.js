@@ -44,10 +44,10 @@ function retrieveConfigMap() {
 }
 
 
-retrieveConfigMap().then(config => {
+//retrieveConfigMap().then(config => {
         // Initialize Discord Bot
         var bot = new Discord.Client({
-            token: config.token,
+            token: process.env.token,
             autorun: true
         });
 
@@ -78,7 +78,7 @@ retrieveConfigMap().then(config => {
 
                 let elapsed = (timestamp - Date.now() / 1000);
 
-                if (config.triviaChannelID == channelID) {
+                if (process.env.triviaChannelID == channelID) {
                     switch (cmd) {
                         case 'help':
                             bot.sendMessage({
@@ -139,4 +139,4 @@ Use **!answer [number]** to answer and **!stats** to see the current scores.
         });
 
     
-});
+//});
