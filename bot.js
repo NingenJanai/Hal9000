@@ -28,7 +28,7 @@ var timestamp = Date.now();
 
 // Initialize Discord Bot
         var bot = new Discord.Client({
-            token: process.env.token,
+            token: process.env.BOT_TOKEN,
             autorun: true
         });
 
@@ -59,7 +59,7 @@ var timestamp = Date.now();
 
                 let elapsed = (timestamp - Date.now() / 1000);
 
-                if (process.env.triviaChannelID == channelID) {
+                if (process.env.CHANNEL_ID_TRIVIA == channelID) {
                     switch (cmd) {
                         case 'help':
                             bot.sendMessage({
