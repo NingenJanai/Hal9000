@@ -1,6 +1,6 @@
 var Discord = require('discord.io');
 var logger = require('winston');
-var auth = require('./auth.json');
+//var auth = require('./auth.json');
 const { Observable, pipe } = require('rxjs');
 const { throttleTime } = require('rxjs/operators');
 
@@ -20,9 +20,24 @@ logger.add(new logger.transports.Console, {
 var question = undefined;
 var timestamp = Date.now();
 
+const openshiftRestClient = require('openshift-rest-client');
+function retrieveConfigMap() {
+  const settings = {
+    request: {
+      strictSSL: false
+    }
+  };
+
+  return openshiftRestClient(settings).then(client => {
+    const configMapName = 'bot-config';
+    return client.configmaps.find(configMapName).then(configMap => {
+        let config = jsyaml.safeLoad(configMap.data['bot-config.yml']);
+        if(config){
+            
+            
 // Initialize Discord Bot
 var bot = new Discord.Client({
-    token: auth.token,
+    token: config.token,
     autorun: true
 });
 
@@ -53,7 +68,7 @@ bot.on('message', function (user, userID, channelID, message, evt) {
 
         let elapsed = (timestamp - Date.now() / 1000);
 
-        if (auth.triviaChannelID == channelID) {
+        if (config.triviaChannelID == channelID) {
             switch (cmd) {
                 case 'help':
                     bot.sendMessage({
@@ -112,3 +127,13 @@ Use **!answer [number]** to answer and **!stats** to see the current scores.
         }
     }
 });
+            
+            
+            
+            
+        }
+    });
+  });
+}
+
+retrieveConfigMap();
