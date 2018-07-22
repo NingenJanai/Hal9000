@@ -7,7 +7,7 @@ module.exports = class Question {
         this.question = entities.decode(data.question);
 
         this.answers = [data.correct_answer, ...data.incorrect_answers];
-        this.answers = _.map(_.shuffle(this.answers, it => entities.decode(it)));
+        this.answers = _.map(_.shuffle(this.answers), it => entities.decode(it));
 
         this.correct_number = _.indexOf(this.answers, entities.decode(data.correct_answer)) + 1;
     }
