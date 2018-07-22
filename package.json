@@ -4,12 +4,16 @@
   "description": "HAL 9000",
   "main": "bot.js",
   "author": "Tomas",
+  "scripts": {
+    "start": "node bot.js"
+  },
   "dependencies": {
     "axios": "^0.18.0",
     "discord.io": "https://github.com/woor/discord.io/tarball/gateway_v6",
     "html-entities": "^1.2.1",
     "lodash": "^4.17.10",
     "rxjs": "^6.2.2",
-    "winston": "^3.0.0"
+    "winston": "^3.0.0",
+    "openshift-rest-client": "^1.4.0"
   }
 }
