@@ -2,10 +2,10 @@
   "name": "hal-bot",
   "version": "1.0.0",
   "description": "HAL 9000",
-  "main": "bot.js",
+  "main": "index.js",
   "author": "Tomas",
   "scripts": {
-    "start": "node bot.js"
+    "start": "node index.js"
   },
   "dependencies": {
     "axios": "^0.18.0",

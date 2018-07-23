@@ -1,7 +1,7 @@
-module.exports = class BotConfig {
+module.exports = class HalConfig {
     constructor() {
         try {
-            let bot_config = require('./bot-config.json');
+            let bot_config = require('./hal.config.json');
             this.BOT_TOKEN = bot_config.BOT_TOKEN;
             this.CHANNEL_ID_TRIVIA = bot_config.CHANNEL_ID_TRIVIA;
         } catch (e) {

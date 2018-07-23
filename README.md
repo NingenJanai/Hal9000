@@ -3,9 +3,9 @@ Discord bot with movie and tv show trivia
 
 ## Config
 
-The bot will look for its config in a file called bot-config.json or if the file doesn't exists will look into the env variables.
+The bot will look for its config in a file called hal.config.json or if the file doesn't exists will look into the env variables.
 
-### bot-config.json
+### hal.config.json
 
 ```
 {
