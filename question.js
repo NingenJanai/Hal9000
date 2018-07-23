@@ -4,19 +4,43 @@ const entities = new Entities();
 
 module.exports = class Question {
     constructor(data) {
-        this.solved = false;
+        this._id = undefined;
 
-        this.users = [];
+        this.category = undefined;
+
         this.question = entities.decode(data.question);
 
         this.answers = [data.correct_answer, ...data.incorrect_answers];
         this.answers = _.map(_.shuffle(this.answers), it => entities.decode(it));
 
         this.correct_number = _.indexOf(this.answers, entities.decode(data.correct_answer)) + 1;
+
+        this.solved = false;
+
+        // To store which users have already given an answer
+        this.users = [];
     }
 
     isSolved() {
         return this.solved;
+    }
+
+    getID() {
+        return this._id;
+    }
+
+    setID(id) {
+        this._id = id;
+        return this;
+    }
+
+    getCategory() {
+        return this.category;
+    }
+
+    setCategory(category) {
+        this.category = category;
+        return this;
     }
 
     canAnswer(userID) {

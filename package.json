@@ -4,6 +4,7 @@
   "description": "HAL 9000",
   "main": "index.js",
   "author": "Tomas",
+  "license": "MPL-2.0",
   "scripts": {
     "start": "node index.js"
   },
@@ -12,6 +13,7 @@
     "discord.io": "https://github.com/woor/discord.io/tarball/gateway_v6",
     "html-entities": "^1.2.1",
     "lodash": "^4.17.10",
+    "monk": "^6.0.6",
     "rxjs": "^6.2.2",
     "winston": "^3.0.0"
   }

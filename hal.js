@@ -11,16 +11,18 @@ const StatsService = require('./stats.service.js');
 
 module.exports = class Hal {
     constructor() {
-        this.trivia = new TriviaService();
-        this.question = undefined;
         this.config = new HalConfig();
-        this.stats = new StatsService();
+
+        this.question = undefined;
+
+        this.trivia = new TriviaService(this.config.MONGO_DB);
+        this.stats = new StatsService(this.config.MONGO_DB);
 
         this.bot = new Discord.Client({
             token: this.config.BOT_TOKEN,
             autorun: true
         });
-
+        
         this.bot.on('ready', (evt) => this.onReady(evt));
         this.bot.on('message', (user, userID, channelID, message, evt) => this.onMessage(user, userID, channelID, message, evt));
     }
@@ -44,6 +46,15 @@ module.exports = class Hal {
 
             if (this.config.CHANNEL_ID_TRIVIA == channelID) {
                 switch (cmd) {
+                    //case '!format':
+                    //    this.bot.getMessages({ channelID: channelID }, (error, response) => {
+                    //        let message_ids = response.map(it => it.id);
+                    //        console.log(message_ids);
+                    //        this.bot.deleteMessages({ channelID: channelID, messageIDs: message_ids });    
+                    //    });
+                        
+
+                        break;
                     case '!help':
                         this.sendMessage(channelID,`Use **!trivia** or **!trivia** *category* to start a new trivia question *(categories: tv / movies)*.
 After the category is set **!trivia** will remember the last category.
@@ -64,13 +75,11 @@ Use **!answer** *number* to answer and **!stats** to see the current scores.
                             if (this.question.canAnswer(userID)) {
                                 let correct = this.question.answer(args[0], userID);
 
-                                if (correct) {
-                                    this.stats.addPoints(user, userID, 1);
+                                this.trivia.storeQuestionAnswer(this.question.getID(), userID, correct);
 
+                                if (correct) {
                                     this.sendMessage(channelID, `Congratulations <@${userID}>. Your are **correct**!`);
                                 } else {
-                                    this.stats.addPoints(user, userID, 0);
-
                                     this.sendMessage(channelID, `Sorry <@${userID}>. Your are **wrong**`);
                                 }
                             } else {
@@ -79,12 +88,18 @@ Use **!answer** *number* to answer and **!stats** to see the current scores.
                         }
                         break;
                     case '!stats':
-                        this.sendMessage(channelID, this.stats.text());
+                        this.stats.getRankingText(this.bot.users).subscribe(text => {
+                            this.sendMessage(channelID, text);
+                        });
                         break;
                 }
             }
         }
     };
+
+    getUser(userID) {
+        return this.bot.users[userID];
+    }
 
     sendMessage(channelID, message) {
         this.bot.sendMessage({

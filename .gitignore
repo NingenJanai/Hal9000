@@ -1,5 +1,5 @@
-hal.config.json
+.vs
 node_modules
 package-lock.json
+hal.config.json
 hal.log
-.vs
