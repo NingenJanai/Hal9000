@@ -6,7 +6,7 @@ const { throttleTime } = require('rxjs/operators');
 
 const Trivia = require('./trivia.js');
 const Stats = require('./stats.js');
-const BotConfig = requier('./botConfig.js');
+const BotConfig = require('./botConfig.js');
 
 const trivia = new Trivia();
 const stats = new Stats();
