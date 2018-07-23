@@ -49,10 +49,9 @@ module.exports = class Hal {
                     //case '!format':
                     //    this.bot.getMessages({ channelID: channelID }, (error, response) => {
                     //        let message_ids = response.map(it => it.id);
-                    //        console.log(message_ids);
                     //        this.bot.deleteMessages({ channelID: channelID, messageIDs: message_ids });    
                     //    });
-                        //break;
+                    //    break;
                     case '!help':
                         this.sendMessage(channelID,`Use **!trivia** or **!trivia** *category* to start a new trivia question *(categories: tv / movies)*.
 After the category is set **!trivia** will remember the last category.
