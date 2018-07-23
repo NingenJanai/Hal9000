@@ -1,20 +1,16 @@
 var Discord = require('discord.io');
 var logger = require('winston');
-//var auth = require('./auth.json');
 
-const {
-    Observable,
-    pipe
-} = require('rxjs');
-const {
-    throttleTime
-} = require('rxjs/operators');
+const { Observable, pipe } = require('rxjs');
+const { throttleTime } = require('rxjs/operators');
 
 const Trivia = require('./trivia.js');
 const Stats = require('./stats.js');
+const BotConfig = requier('./botConfig.js');
 
 const trivia = new Trivia();
 const stats = new Stats();
+const botConfig = new BotConfig();
 
 // Configure logger settings
 logger.remove(logger.transports.Console);
@@ -27,120 +23,95 @@ var question = undefined;
 var timestamp = Date.now();
 
 // Initialize Discord Bot
-        var bot = new Discord.Client({
-            token: process.env.BOT_TOKEN,
-            autorun: true
+var bot = new Discord.Client({
+    token: botConfig.BOT_TOKEN,
+    autorun: true
+});
+
+bot.on('ready', function(evt) {
+    logger.info('Connected');
+    logger.info('Logged in as: ');
+    logger.info(bot.username + ' - (' + bot.id + ')');
+
+    // Subscribe throttle to a new trivia command
+    trivia.subscribe().pipe(throttleTime(10000)).subscribe(it => {
+        question = it.question;
+        bot.sendMessage({
+            to: it.channelID,
+            message: it.question.text()
         });
+    })
+});
 
-        bot.on('ready', function(evt) {
-            logger.info('Connected');
-            logger.info('Logged in as: ');
-            logger.info(bot.username + ' - (' + bot.id + ')');
+bot.on('message', function(user, userID, channelID, message, evt) {
+    console.log(channelID);
 
-            // Subscribe throttle to a new trivia command
-            trivia.subscribe().pipe(throttleTime(10000)).subscribe(it => {
-                question = it.question;
-                bot.sendMessage({
-                    to: it.channelID,
-                    message: it.question.text()
-                });
-            })
-        });
+    // Our bot needs to know if it will execute a command. It will listen for messages that will start with `!`
+    if (message.substring(0, 1) == '!') {
+        var args = message.substring(1).split(' ');
+        var cmd = args[0];
 
-        bot.on('message', function(user, userID, channelID, message, evt) {
-            console.log(channelID);
+        args = args.splice(1);
 
-            // Our bot needs to know if it will execute a command. It will listen for messages that will start with `!`
-            if (message.substring(0, 1) == '!') {
-                var args = message.substring(1).split(' ');
-                var cmd = args[0];
+        let elapsed = (timestamp - Date.now() / 1000);
 
-                args = args.splice(1);
-
-                let elapsed = (timestamp - Date.now() / 1000);
-
-                if (process.env.CHANNEL_ID_TRIVIA == channelID) {
-                    switch (cmd) {
-                        case 'help':
-                            bot.sendMessage({
-                                to: channelID,
-                                message: `Use **!trivia** or **!trivia [category]** to start a new trivia question *(categories: tv / movies)*.
+        if (botConfig.CHANNEL_ID_TRIVIA == channelID) {
+            switch (cmd) {
+                case 'help':
+                    bot.sendMessage({
+                        to: channelID,
+                        message: `Use **!trivia** or **!trivia [category]** to start a new trivia question *(categories: tv / movies)*.
 After the category is set **!trivia** will remember the last category.
 Use **!answer [number]** to answer and **!stats** to see the current scores.
 **!trivia** command can only be used every 10 seconds.`
-                            });
-                            break;
-                        case 'trivia':
-                            if (args.length == 1)
-                                trivia.setCategory(args[0].toLowerCase() == 'tv' ? trivia.TV : trivia.MOVIES);
+                    });
+                    break;
+                case 'trivia':
+                    if (args.length == 1)
+                        trivia.setCategory(args[0].toLowerCase() == 'tv' ? trivia.TV : trivia.MOVIES);
 
-                            trivia.getQuestion(channelID);
+                    trivia.getQuestion(channelID);
 
-                            break;
-                        case 'answer':
-                            if (!question) {
-                                // TODO: Check last trivia time
-                                //bot.sendMessage({
-                                //    to: channelID,
-                                //    message: `Currently there's no trivia running. Use !trivia to start a new one`
-                                //});
-                            } else if (args.length == 1) {
-                                if (question && args[0] == question.correct_number) {
-                                    stats.addPoints(user, userID, 1);
-
-                                    bot.sendMessage({
-                                        to: channelID,
-                                        message: `Congratulations <@${userID}>. Your answer is **correct**!`
-                                    });
-
-                                    question = undefined;
-                                } else {
-                                    stats.addPoints(user, userID, 0);
-
-                                    bot.sendMessage({
-                                        to: channelID,
-                                        message: `Sorry <@${userID}>. Your answer is **wrong**`
-                                    });
-                                }
-                            }
-                            break;
-                        case 'stats':
-
-                            // TODO: Show which users have guessed more right or wrong answers
+                    break;
+                case 'answer':
+                    if (!question) {
+                        // TODO: Check last trivia time
+                        //bot.sendMessage({
+                        //    to: channelID,
+                        //    message: `Currently there's no trivia running. Use !trivia to start a new one`
+                        //});
+                    } else if (args.length == 1) {
+                        if (question && args[0] == question.correct_number) {
+                            stats.addPoints(user, userID, 1);
 
                             bot.sendMessage({
                                 to: channelID,
-                                message: stats.text()
+                                message: `Congratulations <@${userID}>. Your answer is **correct**!`
                             });
-                            break;
-                            // Just add any case commands if you want to..
+
+                            question = undefined;
+                        } else {
+                            stats.addPoints(user, userID, 0);
+
+                            bot.sendMessage({
+                                to: channelID,
+                                message: `Sorry <@${userID}>. Your answer is **wrong**`
+                            });
+                        }
                     }
-                }
+                    break;
+                case 'stats':
+
+                    // TODO: Show which users have guessed more right or wrong answers
+
+                    bot.sendMessage({
+                        to: channelID,
+                        message: stats.text()
+                    });
+                    break;
+                    // Just add any case commands if you want to..
             }
-        });
-
-/*const jsyaml = require('js-yaml');
-const openshiftRestClient = require('openshift-rest-client');
-function retrieveConfigMap() {
-  const settings = {
-    request: {
-      strictSSL: false
+        }
     }
-  };
+});
 
-  return openshiftRestClient(settings).then(client => {
-    const configMapName = 'bot-config';
-    return client.configmaps.find(configMapName).then(configMap => {
-      return jsyaml.safeLoad(configMap.data['bot-config.yml']);
-    });
-  });
-}
-
-console.log(process.env.triviaChannelID, process.end);*/
-/*
-//retrieveConfigMap().then(config => {
-        
-
-    
-//});
-*/

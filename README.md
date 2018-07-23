@@ -1,13 +1,21 @@
 # Hal9000
 Discord bot with movie and tv show trivia
 
-## auth.json
+## Config
 
-In order to run this project, you will need to create an auth.json file in the root directory containing the following information:
+The bot will look for its config in a file called bot-config.json or if the file doesn't exists will look into the env variables.
+
+### bot-config.json
 
 ```
 {
-   "token": "YOUR-BOT-TOKEN",
-   "triviaChannelID" :"ID-OF-THE-CHANNEL-FOR-TRIVIA"
+   "BOT_TOKEN": "YOUR-BOT-TOKEN",
+   "CHANNEL_ID_TRIVIA" : ID-OF-THE-CHANNEL-FOR-TRIVIA
 }
+```
+
+### env
+```
+process.env.BOT_TOKEN = "YOUR-BOT-TOKEN";
+process.env.CHANNEL_ID_TRIVIA = ID-OF-THE-CHANNEL-FOR-TRIVIA;
 ```
