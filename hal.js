@@ -7,7 +7,7 @@ const { throttleTime } = require('rxjs/operators');
 const HalConfig = require('./hal.config.js');
 
 const TriviaService = require('./trivia.service.js');
-const InformationService = require('./information.service.js');
+const TMDBService = require('./tmdb.service.js');
 const StatsService = require('./stats.service.js');
 
 const Question = require('./question.js');
@@ -20,7 +20,7 @@ module.exports = class Hal {
 
         this.trivia = new TriviaService(this.config.MONGO_DB);
         this.stats = new StatsService(this.config.MONGO_DB);
-        this.information = new InformationService(this.config.THE_MOVIE_DB);
+        this.tmdb = new TMDBService(this.config.THE_MOVIE_DB);
 
         this.bot = new Discord.Client({
             token: this.config.BOT_TOKEN,
@@ -42,7 +42,7 @@ module.exports = class Hal {
             this.sendMessage(it.channelID, it.question.text());
         });
 
-        this.information.subscribe().subscribe(it => {
+        this.tmdb.subscribe().subscribe(it => {
             this.sendMessage(it.channelID, it.message);
         });
     }
@@ -105,7 +105,7 @@ Use **!answer** *number* to answer and **!stats** to see the current scores.
                     case '!person':
                         if (args.length > 0) {
                             let query = this.getArgsString(args);
-                            this.information.getPersonInfo(query, channelID);
+                            this.tmdb.getPersonInfo(query, channelID);
                         } else {
                             this.sendMessage(channelID, `You must specify a search parameter`);
                         }
@@ -113,7 +113,7 @@ Use **!answer** *number* to answer and **!stats** to see the current scores.
                     case '!movie':
                         if (args.length > 0) {
                             let query = this.getArgsString(args);
-                            this.information.getMovieInfo(query, channelID);
+                            this.tmdb.getMovieInfo(query, channelID);
                         } else {
                             this.sendMessage(channelID, `You must specify a search parameter`);
                         }
@@ -121,7 +121,7 @@ Use **!answer** *number* to answer and **!stats** to see the current scores.
                     case '!show':
                         if (args.length > 0) {
                             let query = this.getArgsString(args);
-                            this.information.getShowInfo(query, channelID);
+                            this.tmdb.getShowInfo(query, channelID);
                         } else {
                             this.sendMessage(channelID, `You must specify a search parameter`);
                         }

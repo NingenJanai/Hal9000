@@ -7,7 +7,7 @@ const _ = require('lodash');
 const { Observable, Observer, interval, pipe } = require('rxjs');
 const { take } = require('rxjs/operators');
 
-module.exports = class InformationService {
+module.exports = class TMDBService {
     constructor(API_KEY) {
         this.baseUrl = 'https://api.themoviedb.org/3';
         this.API_KEY = API_KEY;
@@ -89,7 +89,7 @@ module.exports = class InformationService {
 
             let results = res.results;
 
-            let exact_matches = _.filter(results, it => _.toLower(it.title) == _.toLower(query));
+            let exact_matches = _.filter(results, it => _.toLower(it.title) == _.toLower(query) || _.toLower(it.original_title) == _.toLower(query));
             if (exact_matches.length > 0) results = exact_matches;
 
             if (results.length == 0)
@@ -121,8 +121,8 @@ module.exports = class InformationService {
 
             let results = res.results;
 
-            
-            let exact_matches = _.filter(results, it => _.toLower(it.name) == _.toLower(query));
+
+            let exact_matches = _.filter(results, it => _.toLower(it.name) == _.toLower(query) || _.toLower(it.original_name) == _.toLower(query));
             if (exact_matches.length > 0) results = exact_matches;
 
             if (results.length == 0)
