@@ -56,6 +56,9 @@ module.exports = class InformationService {
             let exact_matches = _.filter(results, it => _.toLower(it.name) == _.toLower(query));
             if (exact_matches.length > 0) results = exact_matches;
 
+            if (results.length == 0)
+                messages.push(`No data found for query: **${query}**`);
+
             results.forEach((it, ix) => {
                 let message = '';
 
@@ -89,6 +92,9 @@ module.exports = class InformationService {
             let exact_matches = _.filter(results, it => _.toLower(it.title) == _.toLower(query));
             if (exact_matches.length > 0) results = exact_matches;
 
+            if (results.length == 0)
+                messages.push(`No data found for query: **${query}**`);
+
             results.forEach((it, ix) => {
                 let message = '';
 
@@ -115,8 +121,12 @@ module.exports = class InformationService {
 
             let results = res.results;
 
+            
             let exact_matches = _.filter(results, it => _.toLower(it.name) == _.toLower(query));
             if (exact_matches.length > 0) results = exact_matches;
+
+            if (results.length == 0)
+                messages.push(`No data found for query: **${query}**`);
 
             results.forEach((it, ix) => {
                 let message = '';
