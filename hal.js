@@ -40,7 +40,11 @@ module.exports = class Hal {
         this.trivia.subscribe().pipe(throttleTime(10000)).subscribe(it => {
             this.question = it.question;
             this.sendMessage(it.channelID, it.question.text());
-        })
+        });
+
+        this.information.subscribe().subscribe(it => {
+            this.sendMessage(it.channelID, it.message);
+        });
     }
 
     onMessage(user, userID, channelID, message, evt) {
@@ -100,10 +104,24 @@ Use **!answer** *number* to answer and **!stats** to see the current scores.
                         break;
                     case '!person':
                         if (args.length > 0) {
-                            let query = args.join(' ').trim();
-                            this.information.getPersonText(query).subscribe(message => {
-                                this.sendMessage(channelID, message);
-                            })
+                            let query = this.getArgsString(args);
+                            this.information.getPersonInfo(query, channelID);
+                        } else {
+                            this.sendMessage(channelID, `You must specify a search parameter`);
+                        }
+                        break;
+                    case '!movie':
+                        if (args.length > 0) {
+                            let query = this.getArgsString(args);
+                            this.information.getMovieInfo(query, channelID);
+                        } else {
+                            this.sendMessage(channelID, `You must specify a search parameter`);
+                        }
+                        break;
+                    case '!show':
+                        if (args.length > 0) {
+                            let query = this.getArgsString(args);
+                            this.information.getShowInfo(query, channelID);
                         } else {
                             this.sendMessage(channelID, `You must specify a search parameter`);
                         }
@@ -112,6 +130,10 @@ Use **!answer** *number* to answer and **!stats** to see the current scores.
             }
         }
     };
+
+    getArgsString(args) {
+        return args.join(' ').trim();
+    }
 
     getUser(userID) {
         return this.bot.users[userID];
