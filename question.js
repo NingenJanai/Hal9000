@@ -2,10 +2,12 @@ const _ = require('lodash');
 const Entities = require('html-entities').AllHtmlEntities;
 const entities = new Entities();
 
+const Message = require('./message.js');
+
 module.exports = class Question {
     constructor(data) {
         this._id = undefined;
-
+        
         this.category = undefined;
 
         this.question = entities.decode(data.question);
@@ -43,6 +45,15 @@ module.exports = class Question {
         return this;
     }
 
+    getChannelID() {
+        return this.channelID;
+    }
+
+    setChannelID(channelID) {
+        this.channelID = channelID;
+        return this;
+    }
+
     canAnswer(userID) {
         return !_.find(this.users, it => it == userID);
     }
@@ -53,10 +64,11 @@ module.exports = class Question {
         return this.solved;
     }
 
-    text() {
-        let message = `**QUESTION:** ${this.question}\n`;
+    message() {
+        let message = new Message(this.channelID);
+        message.text = `**QUESTION:** ${this.question}\n`;
         this.answers.forEach((it, ix) => {
-            message += `\n**${ix + 1}**:   *${it}*`;
+            message.text += `\n**${ix + 1}**:   *${it}*`;
         });
         return message;
     }

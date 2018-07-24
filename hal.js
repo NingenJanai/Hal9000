@@ -11,6 +11,7 @@ const TMDBService = require('./tmdb.service.js');
 const StatsService = require('./stats.service.js');
 
 const Question = require('./question.js');
+const Message = require('./message.js');
 
 module.exports = class Hal {
     constructor() {
@@ -38,12 +39,12 @@ module.exports = class Hal {
 
         // Subscribe throttle to a new trivia command
         this.trivia.subscribe().pipe(throttleTime(10000)).subscribe(it => {
-            this.question = it.question;
-            this.sendMessage(it.channelID, it.question.text());
+            this.question = it;
+            this.sendMessage(it.message());
         });
 
         this.tmdb.subscribe().subscribe(it => {
-            this.sendMessage(it.channelID, it.message);
+            this.sendMessage(it);
         });
     }
 
@@ -54,17 +55,11 @@ module.exports = class Hal {
 
             if (this.config.CHANNEL_ID_TRIVIA == channelID) {
                 switch (cmd) {
-                    //case '!format':
-                    //    this.bot.getMessages({ channelID: channelID }, (error, response) => {
-                    //        let message_ids = response.map(it => it.id);
-                    //        this.bot.deleteMessages({ channelID: channelID, messageIDs: message_ids });    
-                    //    });
-                    //    break;
                     case '!help':
-                        this.sendMessage(channelID, `Use **!trivia** or **!trivia** *category* to start a new trivia question *(categories: tv / movies)*.
+                        this.sendMessage(new Message(channelID, `Use **!trivia** or **!trivia** *category* to start a new trivia question *(categories: tv / movies)*.
 After the category is set **!trivia** will remember the last category.
 Use **!answer** *number* to answer and **!stats** to see the current scores.
-**!trivia** command can only be used every 10 seconds.`);
+**!trivia** command can only be used every 10 seconds.`));
                         break;
                     case '!trivia':
                         if (args.length == 1)
@@ -75,7 +70,7 @@ Use **!answer** *number* to answer and **!stats** to see the current scores.
                         break;
                     case '!answer':
                         if (!this.question || this.question.isSolved()) {
-                            this.sendMessage(channelID, `Currently there's no trivia running. Use !trivia to start a new one`);
+                            this.sendMessage(new Message(channelID, `Currently there's no trivia running. Use !trivia to start a new one`));
                         } else if (args.length == 1) {
                             if (this.question.canAnswer(userID)) {
                                 let correct = this.question.answer(args[0], userID);
@@ -83,47 +78,59 @@ Use **!answer** *number* to answer and **!stats** to see the current scores.
                                 this.trivia.storeQuestionAnswer(this.question.getID(), userID, correct);
 
                                 if (correct) {
-                                    this.sendMessage(channelID, `Congratulations <@${userID}>. Your are **correct**!`);
+                                    this.sendMessage(new Message(channelID, `Congratulations <@${userID}>. Your are **correct**!`));
                                 } else {
-                                    this.sendMessage(channelID, `Sorry <@${userID}>. Your are **wrong**`);
+                                    this.sendMessage(new Message(channelID, `Sorry <@${userID}>. Your are **wrong**`));
                                 }
                             } else {
-                                this.sendMessage(channelID, `Sorry <@${userID}>. You **already gave an answer**`);
+                                this.sendMessage(new Message(channelID, `Sorry <@${userID}>. You **already gave an answer**`));
                             }
                         }
                         break;
                     case '!stats':
                         this.stats.getRankingText(this.bot.users).subscribe(text => {
-                            this.sendMessage(channelID, text);
+                            this.sendMessage(new Message(channelID, text));
                         });
                         break;
                 }
             } else {
                 switch (cmd) {
-                    case 'help':
+                    //case '!format':
+                    //    if (channelID == '----------') {
+                    //        this.bot.getMessages({ channelID: channelID }, (error, response) => {
+                    //            let message_ids = response.map(it => it.id);
+                    //            this.bot.deleteMessages({ channelID: channelID, messageIDs: message_ids });
+                    //        });
+                    //    }
+                    //    break;
+
+                    case '!help':
+                        this.sendMessage(new Message(channelID, `Use **!person** *query* to search for a person.
+Use **!movie** *query* to search for a movie.
+Use **!show** *query* to search for a tv show.`));
                         break;
                     case '!person':
                         if (args.length > 0) {
                             let query = this.getArgsString(args);
-                            this.tmdb.getPersonInfo(query, channelID);
+                            this.tmdb.searchPerson(query, channelID);
                         } else {
-                            this.sendMessage(channelID, `You must specify a search parameter`);
+                            this.sendMessage(new Message(channelID, `You must specify a search parameter`));
                         }
                         break;
                     case '!movie':
                         if (args.length > 0) {
                             let query = this.getArgsString(args);
-                            this.tmdb.getMovieInfo(query, channelID);
+                            this.tmdb.searchMovie(query, channelID);
                         } else {
-                            this.sendMessage(channelID, `You must specify a search parameter`);
+                            this.sendMessage(new Message(channelID, `You must specify a search parameter`));
                         }
                         break;
                     case '!show':
                         if (args.length > 0) {
                             let query = this.getArgsString(args);
-                            this.tmdb.getShowInfo(query, channelID);
+                            this.tmdb.searchShow(query, channelID);
                         } else {
-                            this.sendMessage(channelID, `You must specify a search parameter`);
+                            this.sendMessage(new Message(channelID, `You must specify a search parameter`));
                         }
                         break;
                 }
@@ -139,10 +146,11 @@ Use **!answer** *number* to answer and **!stats** to see the current scores.
         return this.bot.users[userID];
     }
 
-    sendMessage(channelID, message) {
+    sendMessage(message) {
         this.bot.sendMessage({
-            to: channelID,
-            message: message
+            to: message.channelID,
+            message: message.text,
+            embed: message.embed
         });
     }
 }

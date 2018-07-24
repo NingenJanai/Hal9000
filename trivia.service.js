@@ -71,16 +71,12 @@ module.exports = class TriviaService {
         axios.get(url)
             .then(res => {
                 try {
-                    let question = new Question(res.data.results[0])
-                        .setCategory(this.category);
+                    let question = new Question(res.data.results[0]).setChannelID(channelID).setCategory(this.category);
 
                     this.storeQuestion(question).subscribe(doc => {
                         question.setID(doc._id);
 
-                        if (this.observer) this.observer.next({
-                            question: question,
-                            channelID: channelID
-                        });
+                        if (this.observer) this.observer.next(question);
                     });
                 } catch (err) {
                     if (this.observer) this.observer.error(err);

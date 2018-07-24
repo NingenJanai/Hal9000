@@ -60,7 +60,7 @@ module.exports = class StatsService {
     getRankingText(users) {
         return Observable.create(observer => {
             this.getRanking().subscribe(res => {
-                let message = `**RANK:**\n`;
+                let message = `**RANKING:**\n`;
                 res.forEach((it) => {
                     let user = _.find(users, u => u.id == it._id);
                     message += `\n${user.username}: **${it.points}**`;
