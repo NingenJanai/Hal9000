@@ -98,7 +98,7 @@ module.exports = class TMDBService {
             results.forEach((it, ix) => {
                 let message = '';
 
-                message += `**${ix > 0 ? '\n\n' : ''}${it.title}**\n`;
+                message += `**${ix > 0 ? '\n\n' : ''}${it.title}** *${it.title != it.original_title ? '(' + it.original_title + ')' : ''}*\n`;
                 message += `*${moment(it.release_date).format('MMMM Do YYYY')}*\n\n`
 
                 if (it.poster_path)
@@ -131,7 +131,8 @@ module.exports = class TMDBService {
             results.forEach((it, ix) => {
                 let message = '';
 
-                message += `**${ix > 0 ? '\n\n' : ''}${it.name}**\n`;
+                message += `**${ix > 0 ? '\n\n' : ''}${it.name}** *${it.name != it.original_name ? '(' + it.original_name + ')' : ''}*\n`;
+
                 message += `*${moment(it.first_air_date).format('MMMM Do YYYY')}*\n\n`
 
                 if (it.poster_path)
