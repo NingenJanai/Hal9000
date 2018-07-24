@@ -5,9 +5,12 @@ const { Observable, pipe } = require('rxjs');
 const { throttleTime } = require('rxjs/operators');
 
 const HalConfig = require('./hal.config.js');
+
 const TriviaService = require('./trivia.service.js');
-const Question = require('./question.js');
+const InformationService = require('./information.service.js');
 const StatsService = require('./stats.service.js');
+
+const Question = require('./question.js');
 
 module.exports = class Hal {
     constructor() {
@@ -17,6 +20,7 @@ module.exports = class Hal {
 
         this.trivia = new TriviaService(this.config.MONGO_DB);
         this.stats = new StatsService(this.config.MONGO_DB);
+        this.information = new InformationService(this.config.THE_MOVIE_DB);
 
         this.bot = new Discord.Client({
             token: this.config.BOT_TOKEN,
@@ -53,7 +57,7 @@ module.exports = class Hal {
                     //    });
                     //    break;
                     case '!help':
-                        this.sendMessage(channelID,`Use **!trivia** or **!trivia** *category* to start a new trivia question *(categories: tv / movies)*.
+                        this.sendMessage(channelID, `Use **!trivia** or **!trivia** *category* to start a new trivia question *(categories: tv / movies)*.
 After the category is set **!trivia** will remember the last category.
 Use **!answer** *number* to answer and **!stats** to see the current scores.
 **!trivia** command can only be used every 10 seconds.`);
@@ -88,6 +92,21 @@ Use **!answer** *number* to answer and **!stats** to see the current scores.
                         this.stats.getRankingText(this.bot.users).subscribe(text => {
                             this.sendMessage(channelID, text);
                         });
+                        break;
+                }
+            } else {
+                switch (cmd) {
+                    case 'help':
+                        break;
+                    case '!person':
+                        if (args.length > 0) {
+                            let query = args.join(' ').trim();
+                            this.information.getPersonText(query).subscribe(message => {
+                                this.sendMessage(channelID, message);
+                            })
+                        } else {
+                            this.sendMessage(channelID, `You must specify a search parameter`);
+                        }
                         break;
                 }
             }

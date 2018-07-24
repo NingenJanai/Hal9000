@@ -66,7 +66,9 @@ module.exports = class TriviaService {
     }
 
     getQuestion(channelID) {
-        axios.get(`${this.baseUrl}&category=${this.category}`)
+        let url = `${this.baseUrl}&category=${this.category}`;
+
+        axios.get(url)
             .then(res => {
                 try {
                     let question = new Question(res.data.results[0])

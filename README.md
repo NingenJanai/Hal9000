@@ -13,7 +13,8 @@ The bot will look for its config in a file called hal.config.json or if the file
 {
    "BOT_TOKEN": "YOUR-BOT-TOKEN",
    "CHANNEL_ID_TRIVIA" : ID-OF-THE-CHANNEL-FOR-TRIVIA,
-   "MONGO_DB": "MONGO-CONNECTION-STRING"
+   "MONGO_DB": "MONGO-CONNECTION-STRING",
+   "THE_MOVIE_DB": "THE-MOVIE-DB-API-KEY"
 }
 ```
 
@@ -22,4 +23,5 @@ The bot will look for its config in a file called hal.config.json or if the file
 process.env.BOT_TOKEN = "YOUR-BOT-TOKEN";
 process.env.CHANNEL_ID_TRIVIA = ID-OF-THE-CHANNEL-FOR-TRIVIA;
 process.env.MONGO_DB = "MONGO-CONNECTION-STRING"
+process.env.THE_MOVIE_DB = "THE-MOVIE-DB-API-KEY"
 ```
