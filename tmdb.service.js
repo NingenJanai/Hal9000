@@ -125,7 +125,7 @@ module.exports = class TMDBService {
                         message.text += `*${moment(it.release_date).format('MMMM Do YYYY')}*\n`
 
                         if (imdb_id.trim() != '')
-                            message.text += `IMDB: <https://www.imdb.com/title/${imdb_id}>\n\n`;
+                            message.text += `<https://www.imdb.com/title/${imdb_id}>\n\n`;
 
                         if (it.poster_path) {
                             message.embed = {
