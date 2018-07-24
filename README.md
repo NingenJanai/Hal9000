@@ -1,7 +1,10 @@
 # HAL 9000
-Discord bot with movie and tv show trivia from https://opentdb.com/
+Discord bot about movies and TV shows
 
-Score tracking is kept in Mongo DB
+- Trivia about movies and tv shows from https://opentdb.com/ with the score tracking in a Mongo Database
+
+- Information display about persons, movies and tv shows from https://www.themoviedb.org/
+
 
 ## Config
 
