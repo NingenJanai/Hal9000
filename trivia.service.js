@@ -42,8 +42,6 @@ module.exports = class TriviaService {
     setCategory(category) {
         let new_category = _.find(this.categories, it => _.toLower(it.name) == _.toLower(category));
 
-        console.log('setCategory', category, new_category, this.categories);
-
         if (new_category != this.category) {
             this.category = new_category;
             this.questions_source = [];
