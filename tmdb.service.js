@@ -120,7 +120,9 @@ module.exports = class TMDBService {
                         let message = new Message(channelID);
 
                         message.text += `**${ix > 0 ? '\n\n' : ''}${it.title}** ${it.title != it.original_title ? '*(' + it.original_title + ')*' : ''}\n`;
-                        message.text += `*${moment(it.release_date).format('MMMM Do YYYY')}*\n`
+
+                        if (it.release_date && it.release_date.trim() != '')
+                            message.text += `*${moment(it.release_date).format('MMMM Do YYYY')}*\n`
 
                         if (imdb_id.trim() != '')
                             message.text += `<https://www.imdb.com/title/${imdb_id}>\n\n`;
