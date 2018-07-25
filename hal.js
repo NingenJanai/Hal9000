@@ -58,20 +58,21 @@ module.exports = class Hal {
             if (command && this.security.canRunCommand(command, channelID)) {
                 var args = message.replace(command.name, '').trim().split(' ');
 
+                let tmp = this.bot.getUser(userID);
+                console.log('user', tmp);
+
                 switch (command.name) {
                     case '!help':
-                        if (args.length > 0 && args[0].toLowerCase() == 'trivia')
-                        {
-                            this.trivia.getTriviaCategories().subscribe(res => {
-                                let message = new Message(channelID, '');
-                                res.forEach(cat => {
-                                    message.text += `Use **!trivia ${cat.name}** for *${cat.description}* questions\n`;
-                                });
-                                this.sendMessage(message);
+                        this.sendMessage(new Message(channelID, command.text));
+                        break;
+                    case '!help trivia':
+                        this.trivia.getTriviaCategories().subscribe(res => {
+                            let message = new Message(channelID, '');
+                            res.forEach(cat => {
+                                message.text += `Use **!trivia ${cat.name}** for *${cat.description}* questions\n`;
                             });
-                        }
-                        else
-                            this.sendMessage(new Message(channelID, command.text));
+                            this.sendMessage(message);
+                        });
                         break;
                     case '!cookies':
                         let message = new Message(channelID, '', command.embed);
