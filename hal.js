@@ -80,8 +80,6 @@ module.exports = class Hal {
                         this.sendMessage(message);
                         break;
                     case '!trivia':
-                        console.log('!trivia args', args);
-
                         if (args.length == 1)
                             this.trivia.setCategory(args[0]);
 

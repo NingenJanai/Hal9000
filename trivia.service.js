@@ -17,7 +17,7 @@ module.exports = class TriviaService {
 
         this.getTriviaCategories().subscribe(res => {
             this.categories = res;
-            this.setCategory(this.categories[0]);
+            this.setCategory(this.categories[0].category);
         });
     }
 
@@ -40,7 +40,7 @@ module.exports = class TriviaService {
     }
 
     setCategory(category) {
-        let new_category = _.find(this.categories, it => _.toLower(it.name) == _.toLower(category.name));
+        let new_category = _.find(this.categories, it => _.toLower(it.name) == _.toLower(category));
 
         console.log('setCategory', category, new_category, this.categories);
 
