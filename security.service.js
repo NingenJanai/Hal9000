@@ -17,7 +17,13 @@ module.exports = class SecurityService {
         return this.db.createCommands();
     }
 
+    getCommand(message) {
+        let tmp = _.filter(_.reverse(_.orderBy(this.security, it => it.name.length)), it => _.toLower(message).startsWith(it.name));
+
+        return tmp.length > 0 ? tmp[0] : undefined;
+    }
+
     canRunCommand(command, channelID) {
-        return _.find(this.security, it => it.name == command && _.find(it.channels, c => c == '*' || c == channelID));
+        return _.find(command.channels, c => c == '*' || c == channelID) != undefined;
     }
 }

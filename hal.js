@@ -53,12 +53,11 @@ module.exports = class Hal {
 
     onMessage(user, userID, channelID, message, evt) {
         if (message.substring(0, 1) == '!') {
-            var args = message.split(' ');
-            var cmd = args.splice(0, 1)[0].toLowerCase();
+            let command = this.security.getCommand(message);
 
-            let command = this.security.canRunCommand(cmd, channelID);
+            if (command && this.security.canRunCommand(command, channelID)) {
+                var args = message.replace(command.name, '').trim().split(' ');
 
-            if (command) {
                 switch (command.name) {
                     case '!help':
                         if (args.length > 0 && args[0].toLowerCase() == 'trivia')
@@ -75,11 +74,7 @@ module.exports = class Hal {
                             this.sendMessage(new Message(channelID, command.text));
                         break;
                     case '!cookies':
-                        let message = new Message(channelID, '', {
-                            'image': {
-                                'url': `https://data.whicdn.com/images/199674611/original.gif`
-                            }
-                        });
+                        let message = new Message(channelID, '', command.embed);
                         this.sendMessage(message);
                         break;
                     case '!trivia':

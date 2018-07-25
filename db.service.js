@@ -69,20 +69,24 @@ module.exports = class DBService {
                     return collection.insert([
                         {
                             name: '!help',
-                            text: `Use **!trivia** or **!trivia** *category* to start a new trivia question *(categories: tv / movies)*.
-        After the category is set **!trivia** will remember the last category.
-        Use **!answer** *number* to answer and **!stats** to see the current scores.
-        **!trivia** command can only be used every 10 seconds.`,
+                            text: 'Use **!trivia** or **!trivia** *category* to start a new trivia question *use* **!help-trivia** *to see the available categories*.\nAfter the category is set **!trivia** will remember the last category.\nUse **!answer** *number* to answer and **!stats** to see the current scores.\n**!trivia** command can only be used every 10 seconds.',
                             channels: ['469849162566074368']
                         },
+                        { name: '!help trivia', channels: ['469849162566074368'] },
                         {
                             name: '!help',
-                            text: `Use **!person** *query* to search for a person.
-        Use **!movie** *query* to search for a movie.
-        Use **!show** *query* to search for a tv show.`,
+                            text: 'Use **!person** *query* to search for a person.\nUse **!movie** *query* to search for a movie.\nUse **!show** *query* to search for a tv show.',
                             channels: ['*']
                         },
-                        { name: '!cookies', channels: ['*']},
+                        {
+                            name: '!cookies',
+                            embed: {
+                                'image': {
+                                    'url': 'https://data.whicdn.com/images/199674611/original.gif'
+                                }
+                            },
+                            channels: ['*']
+                        },
                         { name: '!trivia', channels: ['469849162566074368'] },
                         { name: '!answer', channels: ['469849162566074368'] },
                         { name: '!stats', channels: ['469849162566074368'] },
