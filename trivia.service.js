@@ -6,6 +6,7 @@ const monk = require('monk');
 const { Observable, Observer } = require('rxjs');
 
 const Question = require('./question.js');
+const DBService = require('./db.service.js');
 
 
 module.exports = class TriviaService {
@@ -17,52 +18,15 @@ module.exports = class TriviaService {
         this.category = this.MOVIES;
     }
 
-    subscribe() {
-        this.result$ = Observable.create((observer) => {
-            this.observer = observer;
+    // Observable where the questions will be sent
+    onQuestion() {
+        return Observable.create(observer => {
+            this.onQuestion$ = observer;
         });
-        return this.result$;
     }
 
     setCategory(category) {
         this.category = category;
-    }
-
-    storeQuestion(question) {
-        return Observable.create(observer => {
-            let db = monk(this.MONGO_DB);
-
-            let collection = db.get('questions');
-
-            collection.insert({ timestamp: Date.now(), category: question.getCategory(), users: [] })
-                .then(docs => {
-                    observer.next(docs);
-                    observer.complete();
-                })
-                .catch(err => {
-                    winston.error(err);
-                    observer.error(err);
-                })
-                .then(() => db.close());
-        });
-    }
-
-    storeQuestionAnswer(questionID, userID, correct) {
-        let db = monk(this.MONGO_DB);
-
-        let collection = db.get('questions');
-
-        collection.update(
-            { _id: questionID },
-            {
-                $push: {
-                    "users": { userID: userID, correct: correct, timestamp: Date.now() }
-                }
-            })
-            .then(() => db.close())
-            .catch(err => {
-                winston.error(err);
-            });
     }
 
     getQuestion(channelID) {
@@ -73,17 +37,32 @@ module.exports = class TriviaService {
                 try {
                     let question = new Question(res.data.results[0]).setChannelID(channelID).setCategory(this.category);
 
-                    this.storeQuestion(question).subscribe(doc => {
-                        question.setID(doc._id);
+                    new DBService(this.MONGO_DB)
+                        .saveQuestion(question)
+                        .subscribe(doc => {
+                            question.setID(doc._id);
 
-                        if (this.observer) this.observer.next(question);
-                    });
+                            if (this.onQuestion$) this.onQuestion$.next(question);
+                        });
                 } catch (err) {
-                    if (this.observer) this.observer.error(err);
+                    if (this.onQuestion$) this.onQuestion$.error(err);
                 }
             })
             .catch(err => {
-                if (this.observer) this.observer.error(err);
+                if (this.onQuestion$) this.onQuestion$.error(err);
             });
+    }
+
+    answerQuestion(question, answer, userID) {
+        return Observable.create(observer => {
+            let correct = question.answer(answer, userID);
+
+            new DBService(this.MONGO_DB)
+                .saveAnswer(question._id, userID, correct)
+                .subscribe(res => {
+                    observer.next(correct);
+                    observer.complete();
+                });
+        });
     }
 }

@@ -60,7 +60,7 @@ module.exports = class Question {
 
     answer(number, userID) {
         this.users.push(userID);
-        this.solved = this.correct_number == number;
+        this.solved = this.solved == false && this.correct_number == number;
         return this.solved;
     }
 

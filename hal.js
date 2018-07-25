@@ -37,13 +37,13 @@ module.exports = class Hal {
         winston.info('Logged in as: ');
         winston.info(this.bot.username + ' - (' + this.bot.id + ')');
 
-        // Subscribe throttle to a new trivia command
-        this.trivia.subscribe().pipe(throttleTime(10000)).subscribe(it => {
+        // Subscription to new questions throttled so there can never be two questions in less than 10 seconds
+        this.trivia.onQuestion().pipe(throttleTime(10000)).subscribe(it => {
             this.question = it;
             this.sendMessage(it.message());
         });
 
-        this.tmdb.subscribe().subscribe(it => {
+        this.tmdb.onMessage().subscribe(it => {
             this.sendMessage(it);
         });
     }
@@ -73,15 +73,14 @@ Use **!answer** *number* to answer and **!stats** to see the current scores.
                             this.sendMessage(new Message(channelID, `Currently there's no trivia running. Use !trivia to start a new one`));
                         } else if (args.length == 1) {
                             if (this.question.canAnswer(userID)) {
-                                let correct = this.question.answer(args[0], userID);
-
-                                this.trivia.storeQuestionAnswer(this.question.getID(), userID, correct);
-
-                                if (correct) {
-                                    this.sendMessage(new Message(channelID, `Congratulations <@${userID}>. Your are **correct**!`));
-                                } else {
-                                    this.sendMessage(new Message(channelID, `Sorry <@${userID}>. Your are **wrong**`));
-                                }
+                                this.trivia
+                                    .answerQuestion(this.question, args[0], userID)
+                                    .subscribe(correct => {
+                                        if (correct) 
+                                            this.sendMessage(new Message(channelID, `Congratulations <@${userID}>. Your are **correct**!`));
+                                        else
+                                            this.sendMessage(new Message(channelID, `Sorry <@${userID}>. Your are **wrong**`));
+                                    });
                             } else {
                                 this.sendMessage(new Message(channelID, `Sorry <@${userID}>. You **already gave an answer**`));
                             }

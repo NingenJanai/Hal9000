@@ -16,11 +16,11 @@ module.exports = class TMDBService {
         this.API_KEY = API_KEY;
     }
 
-    subscribe() {
-        this.result$ = Observable.create((observer) => {
-            this.observer = observer;
+    // Observable where the information will be sent
+    onMessage() {
+        return Observable.create(observer => {
+            this.onMessage$ = observer;
         });
-        return this.result$;
     }
 
     getData(url) {
@@ -63,15 +63,15 @@ module.exports = class TMDBService {
 
     searchPerson(query, channelID) {
         this._searchPerson(query).subscribe(res => {
-            let messages = [];
-
             let results = _.take(res.results, 5);
 
             let exact_matches = _.filter(results, it => _.toLower(it.name) == _.toLower(query));
             if (exact_matches.length > 0) results = exact_matches;
 
-            if (results.length == 0)
-                messages.push(`No data found for query: **${query}**`);
+            if (results.length == 0) {
+                this.sendMessages([new Message(channelID, `No data found for query: **${query}**`)]);
+                return;
+            }
 
             results.forEach((it, ix) => {
                 let message = new Message(channelID);
@@ -89,9 +89,6 @@ module.exports = class TMDBService {
                     message.text += `**${kx > 0 ? '\n' : ''}${k.original_title}**\n`;
                     if (k.overview.trim() != '')
                         message.text += `\`\`\`${k.overview}\`\`\``;
-
-                    //if (k.poster_path)
-                    //    message += `https://image.tmdb.org/t/p/w200${k.poster_path}\n`;
                 });
 
                 messages.push(message);
@@ -103,21 +100,20 @@ module.exports = class TMDBService {
 
     searchMovie(query, channelID) {
         this._searchMovie(query).subscribe(res => {
-            let messages = [];
-
             let results = _.take(res.results, 5);
 
             let exact_matches = _.filter(results, it => _.toLower(it.title) == _.toLower(query) || _.toLower(it.original_title) == _.toLower(query));
             if (exact_matches.length > 0) results = exact_matches;
 
-            if (results.length == 0)
-                messages.push(`No data found for query: **${query}**`);
+            if (results.length == 0) {
+                this.sendMessages([new Message(channelID, `No data found for query: **${query}**`)]);
+                return;
+            }
             
-            var _details = [];
+            var details$ = [];
 
             results.forEach((it, ix) => {
-
-                _details.push(Observable.create(observer => {
+                details$.push(Observable.create(observer => {
                     this._getMovie(it.id).pipe(map(it => it.imdb_id)).subscribe(imdb_id => {
                         let message = new Message(channelID);
 
@@ -144,7 +140,7 @@ module.exports = class TMDBService {
                 }));
             });
 
-            forkJoin(_details).subscribe(messages => {
+            forkJoin(details$).subscribe(messages => {
                 this.sendMessages(messages); 
             });
         });
@@ -152,15 +148,15 @@ module.exports = class TMDBService {
 
     searchShow(query, channelID) {
         this._searchShow(query).subscribe(res => {
-            let messages = [];
-
             let results = _.take(res.results, 5);
 
             let exact_matches = _.filter(results, it => _.toLower(it.name) == _.toLower(query) || _.toLower(it.original_name) == _.toLower(query));
             if (exact_matches.length > 0) results = exact_matches;
 
-            if (results.length == 0)
-                messages.push(`No data found for query: **${query}**`);
+            if (results.length == 0) {
+                this.sendMessages([new Message(channelID, `No data found for query: **${query}**`)]);
+                return;
+            }
 
             results.forEach((it, ix) => {
                 let message = new Message(channelID);
@@ -189,7 +185,7 @@ module.exports = class TMDBService {
 
     sendMessages(messages, channelID, max) {
         interval(1000).pipe(take(max ? (messages.length > max ? max : messages.length) : messages.length)).subscribe(it => {
-            this.observer.next(messages[it]);
+            if (this.onMessage$) this.onMessage$.next(messages[it]);
         });
     }
 }
