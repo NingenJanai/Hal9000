@@ -4,6 +4,8 @@ var winston = require('winston');
 const { Observable, pipe } = require('rxjs');
 const { throttleTime } = require('rxjs/operators');
 
+const _ = require('lodash');
+
 const HalConfig = require('./hal.config');
 
 const SecurityService = require('./security.service');
@@ -56,7 +58,7 @@ module.exports = class Hal {
             let command = this.security.getCommand(message);
 
             if (command && this.security.canRunCommand(command, channelID)) {
-                var args = message.replace(command.name, '').trim().split(' ');
+                var args = _.filter(message.replace(command.name, '').trim().split(' '), it => it != '');
 
                 switch (command.name) {
                     case '!help':
@@ -76,6 +78,8 @@ module.exports = class Hal {
                         this.sendMessage(message);
                         break;
                     case '!trivia':
+                        console.log('!trivia args', args);
+
                         if (args.length == 1)
                             this.trivia.setCategory(args[0]);
 
