@@ -28,8 +28,6 @@ module.exports = class Hal {
 
         this.tmdb = new TMDBService(this.config.THE_MOVIE_DB);
 
-        this.security.createCommands();
-
         this.bot = new Discord.Client({
             token: this.config.BOT_TOKEN,
             autorun: true
