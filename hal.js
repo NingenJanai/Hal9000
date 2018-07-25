@@ -133,6 +133,15 @@ Use **!show** *query* to search for a tv show.`));
                             this.sendMessage(new Message(channelID, `You must specify a search parameter`));
                         }
                         break;
+                    case '!test':
+                        let message = new Message(channelID);
+                        message.embed = {
+                            'image': {
+                                'url': `https://i.giphy.com/media/9G3wg7lH5DpxC/giphy.mp4`
+                            }
+                        };
+                        this.sendMessage(message);
+                        break;
                 }
             }
         }
