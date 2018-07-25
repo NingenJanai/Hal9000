@@ -6,6 +6,7 @@ const { throttleTime } = require('rxjs/operators');
 
 const HalConfig = require('./hal.config.js');
 
+const SecurityService = require('./security.service.js');
 const TriviaService = require('./trivia.service.js');
 const TMDBService = require('./tmdb.service.js');
 const StatsService = require('./stats.service.js');
@@ -19,8 +20,10 @@ module.exports = class Hal {
 
         this.question = undefined;
 
+        this.security = new SecurityService(this.config.MONGO_DB);
         this.trivia = new TriviaService(this.config.MONGO_DB);
         this.stats = new StatsService(this.config.MONGO_DB);
+
         this.tmdb = new TMDBService(this.config.THE_MOVIE_DB);
 
         this.bot = new Discord.Client({
@@ -53,17 +56,35 @@ module.exports = class Hal {
             var args = message.split(' ');
             var cmd = args.splice(0, 1)[0].toLowerCase();
 
-            if (this.config.CHANNEL_ID_TRIVIA == channelID) {
-                switch (cmd) {
+            let command = this.security.canRunCommand(cmd, channelID);
+
+            if (command) {
+                switch (command.name) {
                     case '!help':
-                        this.sendMessage(new Message(channelID, `Use **!trivia** or **!trivia** *category* to start a new trivia question *(categories: tv / movies)*.
-After the category is set **!trivia** will remember the last category.
-Use **!answer** *number* to answer and **!stats** to see the current scores.
-**!trivia** command can only be used every 10 seconds.`));
+                        if (args.length > 0 && args[0].toLowerCase() == 'trivia')
+                        {
+                            this.trivia.getTriviaCategories().subscribe(res => {
+                                let message = new Message(channelID, '');
+                                res.forEach(cat => {
+                                    message.text += `Use **!trivia ${cat.name}** for *${cat.description}* questions\n`;
+                                });
+                                this.sendMessage(message);
+                            });
+                        }
+                        else
+                            this.sendMessage(new Message(channelID, command.text));
+                        break;
+                    case '!cookies':
+                        let message = new Message(channelID, '', {
+                            'image': {
+                                'url': `https://data.whicdn.com/images/199674611/original.gif`
+                            }
+                        });
+                        this.sendMessage(message);
                         break;
                     case '!trivia':
                         if (args.length == 1)
-                            this.trivia.setCategory(args[0].toLowerCase() == 'tv' ? this.trivia.TV : this.trivia.MOVIES);
+                            this.trivia.setCategory(args[0]);
 
                         this.trivia.getQuestion(channelID);
 
@@ -76,10 +97,10 @@ Use **!answer** *number* to answer and **!stats** to see the current scores.
                                 this.trivia
                                     .answerQuestion(this.question, args[0], userID)
                                     .subscribe(correct => {
-                                        if (correct) 
-                                            this.sendMessage(new Message(channelID, `Congratulations <@${userID}>. Your are **correct**!`));
+                                        if (correct)
+                                            this.sendMessage(new Message(channelID, `Congratulations <@${userID}>. You are **correct**!`));
                                         else
-                                            this.sendMessage(new Message(channelID, `Sorry <@${userID}>. Your are **wrong**`));
+                                            this.sendMessage(new Message(channelID, `Sorry <@${userID}>. You are **wrong**`));
                                     });
                             } else {
                                 this.sendMessage(new Message(channelID, `Sorry <@${userID}>. You **already gave an answer**`));
@@ -90,23 +111,6 @@ Use **!answer** *number* to answer and **!stats** to see the current scores.
                         this.stats.getRankingText(this.bot.users).subscribe(text => {
                             this.sendMessage(new Message(channelID, text));
                         });
-                        break;
-                }
-            } else {
-                switch (cmd) {
-                    //case '!format':
-                    //    if (channelID == '----------') {
-                    //        this.bot.getMessages({ channelID: channelID }, (error, response) => {
-                    //            let message_ids = response.map(it => it.id);
-                    //            this.bot.deleteMessages({ channelID: channelID, messageIDs: message_ids });
-                    //        });
-                    //    }
-                    //    break;
-
-                    case '!help':
-                        this.sendMessage(new Message(channelID, `Use **!person** *query* to search for a person.
-Use **!movie** *query* to search for a movie.
-Use **!show** *query* to search for a tv show.`));
                         break;
                     case '!person':
                         if (args.length > 0) {
@@ -131,15 +135,6 @@ Use **!show** *query* to search for a tv show.`));
                         } else {
                             this.sendMessage(new Message(channelID, `You must specify a search parameter`));
                         }
-                        break;
-                    case '!test':
-                        let message = new Message(channelID, 'hello dude');
-                        message.embed = {
-                            'image': {
-                                'url': `https://i.giphy.com/media/9G3wg7lH5DpxC/giphy.mp4`
-                            }
-                        };
-                        this.sendMessage(message);
                         break;
                 }
             }
