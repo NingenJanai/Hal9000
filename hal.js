@@ -134,7 +134,7 @@ Use **!show** *query* to search for a tv show.`));
                         }
                         break;
                     case '!test':
-                        let message = new Message(channelID);
+                        let message = new Message(channelID, 'hello dude');
                         message.embed = {
                             'image': {
                                 'url': `https://i.giphy.com/media/9G3wg7lH5DpxC/giphy.mp4`
