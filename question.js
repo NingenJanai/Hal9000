@@ -2,7 +2,7 @@ const _ = require('lodash');
 const Entities = require('html-entities').AllHtmlEntities;
 const entities = new Entities();
 
-const Message = require('./message.js');
+const Message = require('./message');
 
 module.exports = class Question {
     constructor(data) {

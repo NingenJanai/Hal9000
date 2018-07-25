@@ -5,8 +5,8 @@ const _ = require('lodash');
 const monk = require('monk');
 const { Observable, Observer, of } = require('rxjs');
 
-const Question = require('./question.js');
-const DBService = require('./db.service.js');
+const Question = require('./question');
+const DBService = require('./db.service');
 
 module.exports = class TriviaService {
     constructor(MONGO_DB) {

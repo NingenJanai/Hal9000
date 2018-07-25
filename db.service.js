@@ -4,7 +4,7 @@ const _ = require('lodash');
 const monk = require('monk');
 const { Observable, Observer } = require('rxjs');
 
-const Question = require('./question.js');
+const Question = require('./question');
 
 module.exports = class DBService {
     constructor(MONGO_DB) {

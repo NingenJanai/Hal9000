@@ -3,7 +3,7 @@ var winston = require('winston');
 const _ = require('lodash');
 const { Observable, Observer } = require('rxjs');
 
-const DBService = require('./db.service.js');
+const DBService = require('./db.service');
 
 module.exports = class SecurityService {
     constructor(MONGO_DB) {

@@ -4,15 +4,15 @@ var winston = require('winston');
 const { Observable, pipe } = require('rxjs');
 const { throttleTime } = require('rxjs/operators');
 
-const HalConfig = require('./hal.config.js');
+const HalConfig = require('./hal.config');
 
-const SecurityService = require('./security.service.js');
-const TriviaService = require('./trivia.service.js');
-const TMDBService = require('./tmdb.service.js');
-const StatsService = require('./stats.service.js');
+const SecurityService = require('./security.service');
+const TriviaService = require('./trivia.service');
+const TMDBService = require('./tmdb.service');
+const StatsService = require('./stats.service');
 
-const Question = require('./question.js');
-const Message = require('./message.js');
+const Question = require('./question');
+const Message = require('./message');
 
 module.exports = class Hal {
     constructor() {
@@ -57,9 +57,6 @@ module.exports = class Hal {
 
             if (command && this.security.canRunCommand(command, channelID)) {
                 var args = message.replace(command.name, '').trim().split(' ');
-
-                let tmp = this.bot.getUser(userID);
-                console.log('user', tmp);
 
                 switch (command.name) {
                     case '!help':

@@ -8,7 +8,7 @@ const _ = require('lodash');
 const { Observable, Observer, interval, pipe, forkJoin } = require('rxjs');
 const { take, map } = require('rxjs/operators');
 
-const Message = require('./message.js');
+const Message = require('./message');
 
 module.exports = class TMDBService {
     constructor(API_KEY) {
