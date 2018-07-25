@@ -63,6 +63,8 @@ module.exports = class TMDBService {
 
     searchPerson(query, channelID) {
         this._searchPerson(query).subscribe(res => {
+            let messages = [];
+
             let results = _.take(res.results, 5);
 
             let exact_matches = _.filter(results, it => _.toLower(it.name) == _.toLower(query));
@@ -148,6 +150,8 @@ module.exports = class TMDBService {
 
     searchShow(query, channelID) {
         this._searchShow(query).subscribe(res => {
+            let messages = [];
+
             let results = _.take(res.results, 5);
 
             let exact_matches = _.filter(results, it => _.toLower(it.name) == _.toLower(query) || _.toLower(it.original_name) == _.toLower(query));

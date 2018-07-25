@@ -1,10 +1,11 @@
 # HAL 9000
 Discord bot about movies and TV shows
 
-- Trivia about movies and tv shows from https://opentdb.com/ with the score tracking in a Mongo Database
+- Trivia from https://opentdb.com/ with the score tracking in a Mongo Database
 
 - Information display about persons, movies and tv shows from https://www.themoviedb.org/
 
+- Movie quote display from https://market.mashape.com/andruxnet/random-famous-quotes
 
 ## Config
 
@@ -16,7 +17,8 @@ The bot will look for its config in a file called hal.config.json or if the file
 {
    "BOT_TOKEN": "YOUR-BOT-TOKEN",
    "MONGO_DB": "MONGO-CONNECTION-STRING",
-   "THE_MOVIE_DB": "THE-MOVIE-DB-API-KEY"
+   "THE_MOVIE_DB": "THE-MOVIE-DB-API-KEY",
+   "MASHAPE": "YOUR-MASHAPE-API-KEY"
 }
 ```
 
@@ -25,6 +27,7 @@ The bot will look for its config in a file called hal.config.json or if the file
 process.env.BOT_TOKEN = "YOUR-BOT-TOKEN";
 process.env.MONGO_DB = "MONGO-CONNECTION-STRING"
 process.env.THE_MOVIE_DB = "THE-MOVIE-DB-API-KEY"
+process.env.MASHAPE = "YOUR-MASHAPE-API-KEY"
 ```
 
 ## Commands
@@ -58,6 +61,7 @@ Commands can only be run on the channels that have access to them, the configura
     { name: '!stats', channels: ['CHANNEL-ID'] },
     { name: '!person', channels: ['*'] },
     { name: '!movie', channels: ['*'] },
-    { name: '!show', channels: ['*'] }
+    { name: '!show', channels: ['*'] },
+    { name: '!quote', channels: ['*'] }
 ]
 ```

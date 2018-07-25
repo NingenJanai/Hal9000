@@ -11,6 +11,7 @@ const HalConfig = require('./hal.config');
 const SecurityService = require('./security.service');
 const TriviaService = require('./trivia.service');
 const TMDBService = require('./tmdb.service');
+const QuotesService = require('./quotes.service');
 const StatsService = require('./stats.service');
 
 const Question = require('./question');
@@ -25,8 +26,8 @@ module.exports = class Hal {
         this.security = new SecurityService(this.config.MONGO_DB);
         this.trivia = new TriviaService(this.config.MONGO_DB);
         this.stats = new StatsService(this.config.MONGO_DB);
-
         this.tmdb = new TMDBService(this.config.THE_MOVIE_DB);
+        this.quotes = new QuotesService(this.config.MASHAPE);
 
         this.bot = new Discord.Client({
             token: this.config.BOT_TOKEN,
@@ -77,6 +78,16 @@ module.exports = class Hal {
                         let message = new Message(channelID, '', command.embed);
                         this.sendMessage(message);
                         break;
+                    case '!quote':
+                        this.quotes.getQuote().subscribe(res => {
+                            let message = new Message(channelID, '', {
+                                color: 3447003,
+                                title: res.author,
+                                description: res.quote
+                            });
+                            this.sendMessage(message);
+                        });
+                        break;
                     case '!trivia':
                         if (args.length == 1)
                             this.trivia.setCategory(args[0]);
@@ -85,9 +96,13 @@ module.exports = class Hal {
 
                         break;
                     case '!answer':
-                        if (!this.question || this.question.isSolved()) {
+                        if (!this.question) {
                             this.sendMessage(new Message(channelID, `Currently there's no trivia running. Use !trivia to start a new one`));
-                        } else if (args.length == 1) {
+                        }
+                        else if (this.question.isSolved()) {
+                            this.sendMessage(new Message(channelID, `Sorry <@${userID}>. You were too **slow**`));
+                        }
+                        else if (args.length == 1) {
                             if (this.question.canAnswer(userID)) {
                                 this.trivia
                                     .answerQuestion(this.question, args[0], userID)

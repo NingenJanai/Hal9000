@@ -61,13 +61,11 @@ module.exports = class TriviaService {
 
                         if (observer) {
                             observer.next(this.questions_source);
-                            observer.complete();
                         }
                     } catch (err) {
                         if (observer) {
                             winston.error(err);
                             observer.error(err);
-                            observer.complete();
                         }
                     }
                 })
@@ -75,7 +73,6 @@ module.exports = class TriviaService {
                     if (observer) {
                         winston.error(err);
                         observer.error(err);
-                        observer.complete();
                     }
                 });
         })
@@ -83,9 +80,9 @@ module.exports = class TriviaService {
     }
 
     _getNextQuestion() {
-        let category = this.category;
-
         return Observable.create(observer => {
+            let category = this.category;
+
             if (this.questions_source && this.questions_source.length > 0) {
                 
                 let item = this.questions_source.splice(0, 1)[0];
