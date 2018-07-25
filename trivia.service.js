@@ -17,7 +17,7 @@ module.exports = class TriviaService {
 
         this.getTriviaCategories().subscribe(res => {
             this.categories = res;
-            this.setCategory(this.categories[0].category);
+            this.setCategory(this.categories[0].name);
         });
     }
 
@@ -39,8 +39,8 @@ module.exports = class TriviaService {
         });
     }
 
-    setCategory(category) {
-        let new_category = _.find(this.categories, it => _.toLower(it.name) == _.toLower(category));
+    setCategory(name) {
+        let new_category = _.find(this.categories, it => _.toLower(it.name) == _.toLower(name));
 
         if (new_category != this.category) {
             this.category = new_category;
@@ -83,6 +83,8 @@ module.exports = class TriviaService {
     }
 
     _getNextQuestion() {
+        let category = this.category;
+
         return Observable.create(observer => {
             if (this.questions_source && this.questions_source.length > 0) {
                 
