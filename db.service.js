@@ -106,13 +106,75 @@ module.exports = class DBService {
         });
     }
 
+    saveTournament(tournament) {
+        return Observable.create(observer => {
+            let db = monk(this.MONGO_DB);
+
+            let collection = db.get('tournaments');
+
+            collection.insert({ timestamp: Date.now(), category: tournament.getCategoryID(), users: [] })
+                .then(docs => {
+                    observer.next(docs);
+                    observer.complete();
+                })
+                .catch(err => {
+                    winston.error(err);
+                    observer.error(err);
+                })
+                .then(() => db.close());
+        });
+    }
+
+    deleteTournament(tournamentID) {
+        return Observable.create(observer => {
+            let db = monk(this.MONGO_DB);
+
+            let collection = db.get('tournaments');
+            collection.remove({ _id: tournamentID })
+                .then(docs => {
+                    observer.next(docs);
+                    observer.complete();
+                })
+                .catch(err => {
+                    winston.error(err);
+                    observer.error(err);
+                })
+                .then(() => db.close());
+        });
+    }
+
+    saveTournamentUser(tournamentID, userID) {
+        return Observable.create(observer => {
+            let db = monk(this.MONGO_DB);
+
+            let collection = db.get('tournaments');
+
+            collection.update(
+                { _id: tournamentID },
+                {
+                    $push: {
+                        "users": { userID: userID, timestamp: Date.now() }
+                    }
+                })
+                .then(docs => {
+                    observer.next(docs);
+                    observer.complete();
+                })
+                .catch(err => {
+                    winston.error(err);
+                    observer.error(err);
+                })
+                .then(() => db.close());
+        });
+    }
+
     saveQuestion(question) {
         return Observable.create(observer => {
             let db = monk(this.MONGO_DB);
 
             let collection = db.get('questions');
 
-            collection.insert({ timestamp: Date.now(), category: question.getCategory(), users: [] })
+            collection.insert({ timestamp: Date.now(), category: question.getCategoryID(), tournament_id: question.getTournamentID(), users: [] })
                 .then(docs => {
                     observer.next(docs);
                     observer.complete();

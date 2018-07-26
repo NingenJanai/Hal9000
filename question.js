@@ -7,8 +7,10 @@ const Message = require('./message');
 module.exports = class Question {
     constructor(data) {
         this._id = undefined;
-        
-        this.category = undefined;
+
+        this.tournament_id = undefined;
+
+        this.category_id = undefined;
 
         this.question = entities.decode(data.question);
 
@@ -36,12 +38,25 @@ module.exports = class Question {
         return this;
     }
 
-    getCategory() {
-        return this.category;
+    getUsers() {
+        return this.users;
     }
 
-    setCategory(category) {
-        this.category = category;
+    getCategoryID() {
+        return this.category_id;
+    }
+
+    setCategoryID(category_id) {
+        this.category_id = category_id;
+        return this;
+    }
+
+    getTournamentID() {
+        return this.tournament_id;
+    }
+
+    setTournamentID(tournament_id) {
+        this.tournament_id = tournament_id;
         return this;
     }
 
