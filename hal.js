@@ -89,8 +89,11 @@ module.exports = class Hal {
                         });
                         break;
                     case '!trivia':
-                        if (args.length == 1)
-                            this.trivia.setCategory(args[0]);
+                        if (args.length == 1) {
+                            let new_category = this.trivia.setCategory(args[0]);
+                            if (!new_category) this.sendMessage(new Message(channelID, `Category **${args[0]}** doesn't exist. Use **!help trivia** to see available categories.`));
+                            break;
+                        }
 
                         this.trivia.getQuestion(channelID);
 
@@ -146,6 +149,11 @@ module.exports = class Hal {
                             this.sendMessage(new Message(channelID, `You must specify a search parameter`));
                         }
                         break;
+                    //case '!format':
+                    //    this.bot.getMessages({ channelID: channelID }, (error, response) => {
+                    //        let message_ids = response.map(it => it.id);
+                    //        this.bot.deleteMessages({ channelID: channelID, messageIDs: message_ids });    
+                    //    });
                 }
             }
         }

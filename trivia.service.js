@@ -39,13 +39,19 @@ module.exports = class TriviaService {
         });
     }
 
-    setCategory(name) {
-        let new_category = _.find(this.categories, it => _.toLower(it.name) == _.toLower(name));
+    getCategory(name) {
+        return _.find(this.categories, it => _.toLower(it.name) == _.toLower(name));
+    }
 
-        if (new_category != this.category) {
+    setCategory(name) {
+        let new_category = this.getCategory(name);
+
+        if (new_category && new_category != this.category) {
             this.category = new_category;
             this.questions_source = [];
         }
+
+        return new_category;
     }
 
     readyQuestions() {
