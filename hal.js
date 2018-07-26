@@ -34,7 +34,7 @@ module.exports = class Hal {
             token: this.config.BOT_TOKEN,
             autorun: true
         });
-        
+
         this.bot.on('ready', (evt) => this.onReady(evt));
         this.bot.on('message', (user, userID, channelID, message, evt) => this.onMessage(user, userID, channelID, message, evt));
     }
@@ -45,14 +45,16 @@ module.exports = class Hal {
         winston.info(this.bot.username + ' - (' + this.bot.id + ')');
 
         // Subscription to new questions throttled so there can never be two questions in less than 2 seconds
-        this.trivia.onQuestion().pipe(throttleTime(2000)).subscribe(it => {
-            this.question = it;
-            this.sendMessage(it.message());
-        });
+        this.trivia.onQuestion().pipe(throttleTime(2000))
+            .subscribe(it => {
+                this.question = it;
+                this.sendMessage(it.message());
+            });
 
-        this.tmdb.onMessage().subscribe(it => {
-            this.sendMessage(it);
-        });
+        this.tmdb.onMessage()
+            .subscribe(it => {
+                this.sendMessage(it);
+            });
     }
 
     onMessage(user, userID, channelID, message, evt) {
@@ -116,7 +118,7 @@ module.exports = class Hal {
                             let size = parseInt(args[1]);
 
                             if (!category) errors.push(`Category **${args[0]}** doesn't exist. Use **!help trivia** to see available categories.\n`);
-                            if (typeof size !== "number"|| size < 10 || size > 50) errors.push(`Size **${args[1]}** is not a valid size. Min size is 10 and max is 50.\n`);
+                            if (typeof size !== "number" || size < 10 || size > 50) errors.push(`Size **${args[1]}** is not a valid size. Min size is 10 and max is 50.\n`);
 
                             if (errors.length > 0) {
                                 this.sendMessage(new Message(channelID, this.arrayToString(errors)));
@@ -138,7 +140,7 @@ module.exports = class Hal {
                                                     this.trivia.startTournament(channelID, this.tournament);
                                             });
                                         });
-                                        
+
                                     });
                             }
                         }
@@ -166,14 +168,14 @@ module.exports = class Hal {
                             if (this.tournament && !this.tournament.isFinished()) {
                                 error = this.tournament.canAnswer(userID) ? '' : `Sorry <@${userID}>. You **are not participating in the tournament.**.`;
                             } else {
-                                error = this.tournament.canAnswer(userID) ? '' : `Sorry <@${userID}>. You **already gave an answer**.`;
+                                error = this.question.canAnswer(userID) ? '' : `Sorry <@${userID}>. You **already gave an answer**.`;
                             }
 
                             if (error == '') {
                                 this.trivia
                                     .answerQuestion(this.question, args[0], userID)
                                     .subscribe(correct => {
-                                        if (correct) 
+                                        if (correct)
                                             this.sendMessage(new Message(channelID, `Congratulations <@${userID}>. You are **correct**!`));
                                         else
                                             this.sendMessage(new Message(channelID, `Sorry <@${userID}>. You are **wrong**.`));
@@ -191,7 +193,7 @@ module.exports = class Hal {
                                                         this.sendMessage(new Message(channelID, text));
                                                     });
                                                 }
-                                            } 
+                                            }
                                         }
                                     });
                             } else {
