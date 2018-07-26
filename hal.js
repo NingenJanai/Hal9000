@@ -11,6 +11,7 @@ const HalConfig = require('./hal.config');
 const SecurityService = require('./security.service');
 const TriviaService = require('./trivia.service');
 const TMDBService = require('./tmdb.service');
+const OMDBService = require('./omdb.service');
 const QuotesService = require('./quotes.service');
 const StatsService = require('./stats.service');
 
@@ -28,6 +29,7 @@ module.exports = class Hal {
         this.trivia = new TriviaService(this.config.MONGO_DB);
         this.stats = new StatsService(this.config.MONGO_DB);
         this.tmdb = new TMDBService(this.config.THE_MOVIE_DB);
+        this.omdb = new OMDBService(this.config.OMDB);
         this.quotes = new QuotesService(this.config.MASHAPE);
 
         this.bot = new Discord.Client({
@@ -52,6 +54,11 @@ module.exports = class Hal {
             });
 
         this.tmdb.onMessage()
+            .subscribe(it => {
+                this.sendMessage(it);
+            });
+
+        this.omdb.onMessage()
             .subscribe(it => {
                 this.sendMessage(it);
             });
@@ -217,7 +224,8 @@ module.exports = class Hal {
                     case '!movie':
                         if (args.length > 0) {
                             let query = this.arrayToString(args);
-                            this.tmdb.searchMovie(query, channelID);
+                            //this.tmdb.searchMovie(query, channelID);
+                            this.tmdb.searchShow(query, channelID);
                         } else {
                             this.sendMessage(new Message(channelID, `You must specify a search parameter`));
                         }
@@ -225,7 +233,8 @@ module.exports = class Hal {
                     case '!show':
                         if (args.length > 0) {
                             let query = this.arrayToString(args);
-                            this.tmdb.searchShow(query, channelID);
+                            //this.tmdb.searchShow(query, channelID);
+                            this.omdb.searchShow(query, channelID);
                         } else {
                             this.sendMessage(new Message(channelID, `You must specify a search parameter`));
                         }
