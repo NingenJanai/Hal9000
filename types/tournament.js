@@ -76,7 +76,7 @@ module.exports = class Tournament {
     }
 
     canJoin(userID) {
-        return _.filter(this.users, it => it == userID);
+        return !this.isFinished() && !this.isStarted() && _.filter(this.users, it => it == userID);
     }
 
     join(userID) {

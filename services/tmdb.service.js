@@ -97,8 +97,9 @@ module.exports = class TMDBService extends BaseService {
             results.forEach((it, ix) => {
                 details$.push(Observable.create(observer => {
                     this._getMovie(it.id).pipe(map(it => it.imdb_id)).subscribe(imdb_id => {
-                        let message = new Message(channelID);
+                        let messages = [];
 
+                        let message = new Message(channelID);
                         message.content += `**${ix > 0 ? '\n\n' : ''}${it.title}** ${it.title != it.original_title ? '*(' + it.original_title + ')*' : ''}\n`;
 
                         if (it.release_date && it.release_date.trim() != '')
@@ -107,28 +108,27 @@ module.exports = class TMDBService extends BaseService {
                         if (imdb_id.trim() != '')
                             message.content += `<https://www.imdb.com/title/${imdb_id}>\n\n`;
 
-
                         if (it.overview.trim() != '')
                             message.content += `\`\`\`${it.overview}\`\`\`\n\n`;
 
-                        observer.next(message);
-
+                        messages.push(message);
 
                         if (it.poster_path) {
-                            observer.next(new Message(channelID, new Discord.RichEmbed({
+                            messages.push(new Message(channelID, new Discord.RichEmbed({
                                 'image': {
                                     'url': `https://image.tmdb.org/t/p/w200${it.poster_path}`
                                 }
                             })));
                         }
 
+                        observer.next(messages);
                         observer.complete();
                     });
                 }));
             });
 
             forkJoin(details$).subscribe(messages => {
-                this.sendMessages(messages); 
+                this.sendMessages(_.flatten(messages)); 
             });
         });
     }

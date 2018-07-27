@@ -1,5 +1,5 @@
 const axios = require('axios');
-const { Observable, Observer, interval, pipe } = require('rxjs');
+const { Observable, Observer, timer, pipe } = require('rxjs');
 const { take } = require('rxjs/operators');
 
 module.exports = class BaseService {
@@ -9,8 +9,8 @@ module.exports = class BaseService {
         });
     }
 
-    sendMessages(messages, channelID, max) {
-        interval(1000).pipe(take(max ? (messages.length > max ? max : messages.length) : messages.length)).subscribe(it => {
+    sendMessages(messages, channelID) {
+        timer(0, 1000).pipe(take(messages.length)).subscribe(it => {
             if (this.onMessage$) this.onMessage$.next(messages[it]);
         });
     }
