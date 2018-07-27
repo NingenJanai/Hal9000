@@ -1,22 +1,23 @@
 var Discord = require('discord.io');
 var winston = require('winston');
 
-const { Observable, pipe, timer } = require('rxjs');
+const { Observable, pipe, timer, merge } = require('rxjs');
 const { throttleTime } = require('rxjs/operators');
 
 const _ = require('lodash');
 
+// Types
 const HalConfig = require('./hal.config');
-
-const SecurityService = require('./security.service');
-const TriviaService = require('./trivia.service');
-const TMDBService = require('./tmdb.service');
-const OMDBService = require('./omdb.service');
-const QuotesService = require('./quotes.service');
-const StatsService = require('./stats.service');
-
 const Question = require('./question');
 const Message = require('./message');
+
+// Services
+const SecurityService = require('../services/security.service');
+const TriviaService = require('../services/trivia.service');
+const TMDBService = require('../services/tmdb.service');
+const OMDBService = require('../services/omdb.service');
+const QuotesService = require('../services/quotes.service');
+const StatsService = require('../services/stats.service');
 
 module.exports = class Hal {
     constructor() {
@@ -48,19 +49,14 @@ module.exports = class Hal {
 
         // Subscription to new questions throttled so there can never be two questions in less than 2 seconds
         this.trivia.onQuestion().pipe(throttleTime(2000))
-            .subscribe(it => {
-                this.question = it;
-                this.sendMessage(it.message());
+            .subscribe(question => {
+                this.question = question;
+                this.sendMessage(question.message());
             });
 
-        this.tmdb.onMessage()
-            .subscribe(it => {
-                this.sendMessage(it);
-            });
-
-        this.omdb.onMessage()
-            .subscribe(it => {
-                this.sendMessage(it);
+        merge(this.trivia.onMessage(), this.tmdb.onMessage(), this.omdb.onMessage(), this.quotes.onMessage(), this.stats.onMessage())
+            .subscribe(message => {
+                this.sendMessage(message);
             });
     }
 
@@ -89,14 +85,7 @@ module.exports = class Hal {
                         this.sendMessage(message);
                         break;
                     case '!quote':
-                        this.quotes.getQuote().subscribe(res => {
-                            let message = new Message(channelID, '', {
-                                color: 3447003,
-                                title: res.author,
-                                description: res.quote
-                            });
-                            this.sendMessage(message);
-                        });
+                        this.quotes.getQuote(channelID);
                         break;
                     case '!trivia':
                         if (!this.tournament || this.tournament.isFinished()) {
@@ -154,7 +143,8 @@ module.exports = class Hal {
                         break;
                     case '!join tournament':
                         if (this.tournament && !this.tournament.isStarted() && !this.tournament.isFinished()) {
-                            this.trivia.joinTournament(this.tournament, userID)
+                            this.trivia
+                                .joinTournament(this.tournament, userID)
                                 .subscribe(res => {
                                     this.sendMessage(new Message(channelID, `User <@${userID}> has joined the tournament`));
                                 });
@@ -196,9 +186,7 @@ module.exports = class Hal {
                                                 }
                                                 else {
                                                     this.tournament.finish();
-                                                    this.stats.getTournamentRanking(this.tournament._id, this.bot.users).subscribe(text => {
-                                                        this.sendMessage(new Message(channelID, text));
-                                                    });
+                                                    this.stats.getTournamentRanking(channelID, this.tournament._id, this.bot.users);
                                                 }
                                             }
                                         }
@@ -209,9 +197,7 @@ module.exports = class Hal {
                         }
                         break;
                     case '!stats':
-                        this.stats.getRanking(this.bot.users).subscribe(text => {
-                            this.sendMessage(new Message(channelID, text));
-                        });
+                        this.stats.getRanking(channelID, this.bot.users);
                         break;
                     case '!person':
                         if (args.length > 0) {

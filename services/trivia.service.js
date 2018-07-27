@@ -5,12 +5,16 @@ const _ = require('lodash');
 const monk = require('monk');
 const { Observable, Observer, of } = require('rxjs');
 
-const Question = require('./question');
-const Tournament = require('./tournament');
-const DBService = require('./db.service');
+const Question = require('../types/question');
+const Tournament = require('../types/tournament');
 
-module.exports = class TriviaService {
+const DBService = require('./db.service');
+const BaseService = require('./base.service');
+
+module.exports = class TriviaService extends BaseService {
     constructor(MONGO_DB) {
+        super();
+
         this.db = new DBService(MONGO_DB);
         this.baseUrl = 'https://opentdb.com/api.php?';
 

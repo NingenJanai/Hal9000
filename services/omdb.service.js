@@ -1,44 +1,16 @@
-var Discord = require('discord.io');
 var winston = require('winston');
-var moment = require('moment');
 
-const axios = require('axios');
 const _ = require('lodash');
 
-const { Observable, Observer, interval, pipe, forkJoin } = require('rxjs');
-const { take, map } = require('rxjs/operators');
+const Message = require('../types/message');
+const BaseService = require('./base.service');
 
-const Message = require('./message');
-
-module.exports = class OMDBService {
+module.exports = class OMDBService extends BaseService {
     constructor(API_KEY) {
+        super();
+
         this.API_KEY = API_KEY;
         this.baseUrl = `http://www.omdbapi.com/?apikey=${this.API_KEY}&plot=full`;
-    }
-
-    // Observable where the information will be sent
-    onMessage() {
-        return Observable.create(observer => {
-            this.onMessage$ = observer;
-        });
-    }
-
-    getData(url) {
-        return Observable.create(observer => {
-            axios.get(url)
-                .then(res => {
-                    if (observer) {
-                        observer.next(res.data);
-                        observer.complete();
-                    }
-                })
-                .catch(err => {
-                    if (observer) {
-                        observer.error(err);
-                        observer.complete();
-                    }
-                });
-        });
     }
 
     _searchMovie(query) {
@@ -117,12 +89,6 @@ module.exports = class OMDBService {
                 message.text += `\`\`\`${show.Plot}\`\`\`\n\n`;
 
             this.sendMessages([message]);
-        });
-    }
-
-    sendMessages(messages, channelID, max) {
-        interval(1000).pipe(take(max ? (messages.length > max ? max : messages.length) : messages.length)).subscribe(it => {
-            if (this.onMessage$) this.onMessage$.next(messages[it]);
         });
     }
 }

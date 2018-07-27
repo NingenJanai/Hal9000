@@ -1,44 +1,21 @@
-var Discord = require('discord.io');
 var winston = require('winston');
 var moment = require('moment');
 
-const axios = require('axios');
 const _ = require('lodash');
 
-const { Observable, Observer, interval, pipe, forkJoin } = require('rxjs');
-const { take, map } = require('rxjs/operators');
+const { Observable, pipe, forkJoin } = require('rxjs');
+const { map } = require('rxjs/operators');
 
-const Message = require('./message');
+const Message = require('../types/message');
 
-module.exports = class TMDBService {
+const BaseService = require('./base.service');
+
+module.exports = class TMDBService extends BaseService {
     constructor(API_KEY) {
+        super();
+
         this.baseUrl = 'https://api.themoviedb.org/3';
         this.API_KEY = API_KEY;
-    }
-
-    // Observable where the information will be sent
-    onMessage() {
-        return Observable.create(observer => {
-            this.onMessage$ = observer;
-        });
-    }
-
-    getData(url) {
-        return Observable.create(observer => {
-            axios.get(url)
-                .then(res => {
-                    if (observer) {
-                        observer.next(res.data);
-                        observer.complete();
-                    }
-                })
-                .catch(err => {
-                    if (observer) {
-                        observer.error(err);
-                        observer.complete();
-                    }
-                });
-        });
     }
 
     _searchPerson(query) {
@@ -186,12 +163,6 @@ module.exports = class TMDBService {
             });
 
             this.sendMessages(messages);
-        });
-    }
-
-    sendMessages(messages, channelID, max) {
-        interval(1000).pipe(take(max ? (messages.length > max ? max : messages.length) : messages.length)).subscribe(it => {
-            if (this.onMessage$) this.onMessage$.next(messages[it]);
         });
     }
 }

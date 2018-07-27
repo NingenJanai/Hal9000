@@ -4,7 +4,6 @@ const _ = require('lodash');
 const monk = require('monk');
 const { Observable, Observer } = require('rxjs');
 
-const Question = require('./question');
 module.exports = class DBService {
     constructor(MONGO_DB) {
         this.MONGO_DB = MONGO_DB;
@@ -13,7 +12,7 @@ module.exports = class DBService {
     createTriviaCategories() {
         return Observable.create(observer => {
             try {
-                let categories = require('./trivia.categories.json');
+                let categories = require('../trivia.categories.json');
 
                 let db = monk(this.MONGO_DB);
 
@@ -61,7 +60,7 @@ module.exports = class DBService {
     createCommands() {
         return Observable.create(observer => {
             try {
-                let commands = require('./commands.json');
+                let commands = require('../commands.json');
 
                 let db = monk(this.MONGO_DB);
 
@@ -200,6 +199,111 @@ module.exports = class DBService {
                         "users": { userID: userID, correct: correct, timestamp: Date.now() }
                     }
                 })
+                .then(docs => {
+                    observer.next(docs);
+                    observer.complete();
+                })
+                .catch(err => {
+                    winston.error(err);
+                    observer.error(err);
+                })
+                .then(() => db.close());
+        });
+    }
+
+    getRankingData() {
+        return Observable.create(observer => {
+            let db = monk(this.MONGO_DB);
+
+            let collection = db.get('questions');
+
+            collection.aggregate([
+                {
+                    $unwind: {
+                        path: "$users",
+                        preserveNullAndEmptyArrays: true
+                    }
+                },
+                {
+                    $project: {
+                        "users.userID": 1,
+                        "users.correct": 1
+                    }
+                },
+                {
+                    $match: {
+                        "users.correct": true
+                    }
+                },
+                {
+                    $group: {
+                        _id: "$users.userID",
+                        points: {
+                            $sum: 1
+                        }
+                    }
+                },
+                {
+                    $sort: {
+                        points: -1
+                    }
+                }
+            ])
+                .then(docs => {
+                    observer.next(docs);
+                    observer.complete();
+                })
+                .catch(err => {
+                    winston.error(err);
+                    observer.error(err);
+                })
+                .then(() => db.close());
+        });
+    }
+
+    getTournamentRankingData(tournament_id) {
+        return Observable.create(observer => {
+            let db = monk(this.MONGO_DB);
+
+            let collection = db.get('questions');
+
+            collection.aggregate([
+                {
+                    $match: {
+                        tournament_id: tournament_id
+                    }
+                },
+                {
+                    $unwind: {
+                        path: "$users",
+                        preserveNullAndEmptyArrays: true
+                    }
+                },
+                {
+                    $project: {
+                        "users.userID": 1,
+                        "users.correct": 1
+                    }
+                },
+                {
+                    $match: {
+                        "users.correct": true
+                    }
+                },
+                {
+                    $group: {
+                        _id: "$users.userID",
+                        points: {
+                            $sum: 1
+                        }
+                    }
+                },
+                {
+                    $sort: {
+                        points: -1
+                    }
+                }
+            ])
                 .then(docs => {
                     observer.next(docs);
                     observer.complete();

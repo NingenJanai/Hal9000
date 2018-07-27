@@ -1,5 +1,5 @@
 var winston = require('winston');
-const Hal = require('./hal');
+const Hal = require('./types/hal');
 
 // Configure winston settings
 winston.clear();
