@@ -1,3 +1,5 @@
+var Discord = require('discord.js');
+
 var winston = require('winston');
 
 const _ = require('lodash');
@@ -35,28 +37,32 @@ module.exports = class OMDBService extends BaseService {
                 return;
             }
 
+            let messages = [];
+
             let message = new Message(channelID);
 
-            message.text += `**${movie.Title}**\n`;
+            message.content += `**${movie.Title}**\n`;
 
             if (movie.Released)
-                message.text += `*${movie.Released}*\n`
+                message.content += `*${movie.Released}*\n`
 
             if (movie.imdbID)
-                message.text += `<https://www.imdb.com/title/${movie.imdbID}>\n\n`;
+                message.content += `<https://www.imdb.com/title/${movie.imdbID}>\n\n`;
+
+            if (movie.Plot != '')
+                message.content += `\`\`\`${movie.Plot}\`\`\`\n\n`;
+
+            messages.push(message);
 
             if (movie.Poster) {
-                message.embed = {
+                messages.push(new Message(channelID, new Discord.RichEmbed({
                     'image': {
                         'url': `${movie.Poster}`
                     }
-                };
+                })));
             }
-
-            if (movie.Plot != '')
-                message.text += `\`\`\`${movie.Plot}\`\`\`\n\n`;
             
-            this.sendMessages([message]); 
+            this.sendMessages(messages); 
         });
     }
 
@@ -67,28 +73,32 @@ module.exports = class OMDBService extends BaseService {
                 return;
             }
 
+            let messages = [];
+
             let message = new Message(channelID);
 
-            message.text += `**${show.Title}**\n`;
+            message.content += `**${show.Title}**\n`;
 
             if (show.Released)
-                message.text += `*${show.Released}*\n`
+                message.content += `*${show.Released}*\n`
 
             if (show.imdbID)
-                message.text += `<https://www.imdb.com/title/${show.imdbID}>\n\n`;
+                message.content += `<https://www.imdb.com/title/${show.imdbID}>\n\n`;
+
+            if (show.Plot != '')
+                message.content += `\`\`\`${show.Plot}\`\`\`\n\n`;
+
+            messages.push(message);
 
             if (show.Poster) {
-                message.embed = {
+                messages.push(new Message(channelID, new Discord.RichEmbed({
                     'image': {
                         'url': `${show.Poster}`
                     }
-                };
+                })));
             }
 
-            if (show.Plot != '')
-                message.text += `\`\`\`${show.Plot}\`\`\`\n\n`;
-
-            this.sendMessages([message]);
+            this.sendMessages(messages);
         });
     }
 }

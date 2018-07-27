@@ -1,7 +1,7 @@
 module.exports = class Message {
-    constructor(channelID, text, embed) {
+    constructor(channelID, content) {
         this.channelID = channelID;
-        this.text = text ? text : '';
-        this.embed = embed;
+        this.content = content ? content : '';// = text ? text : '';
+        //this.embed = embed;
     }
 }

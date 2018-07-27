@@ -15,8 +15,7 @@ module.exports = class StatsService extends BaseService {
         this.db.getRankingData().subscribe(res => {
             let message = new Message(channelID, `**RANKING:**\n`);
             res.forEach((it) => {
-                let user = _.find(users, u => u.id == it._id);
-                message.text += `\n${user.username}: **${it.points}**`;
+                message.content += `\n${this.getUsername(users, it._id)}: **${it.points}**`;
             });
 
             if (this.onMessage$) this.onMessage$.next(message);
@@ -27,11 +26,15 @@ module.exports = class StatsService extends BaseService {
         this.db.getTournamentRankingData(tournament_id).subscribe(res => {
             let message = new Message(channelID, `**TOURNAMENT RANKING:**\n`);
             res.forEach((it) => {
-                let user = _.find(users, u => u.id == it._id);
-                message.text += `\n${user.username}: **${it.points}**`;
+                message.content += `\n${this.getUsername(users, it._id)}: **${it.points}**`;
             });
 
             if (this.onMessage$) this.onMessage$.next(message);
         });
+    }
+
+    getUsername(users, id) {
+        let user = users.get(id);
+        return user.username;
     }
 }

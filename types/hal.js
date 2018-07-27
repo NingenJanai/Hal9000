@@ -1,4 +1,4 @@
-var Discord = require('discord.io');
+var Discord = require('discord.js');
 var winston = require('winston');
 
 const { Observable, pipe, timer, merge } = require('rxjs');
@@ -33,13 +33,15 @@ module.exports = class Hal {
         this.omdb = new OMDBService(this.config.OMDB);
         this.quotes = new QuotesService(this.config.MASHAPE);
 
-        this.bot = new Discord.Client({
-            token: this.config.BOT_TOKEN,
-            autorun: true
-        });
+        this.bot = new Discord.Client();
+        //this.bot = new Discord.Client({
+        //    token: this.config.BOT_TOKEN
+        //});
+
+        this.bot.login(this.config.BOT_TOKEN);
 
         this.bot.on('ready', (evt) => this.onReady(evt));
-        this.bot.on('message', (user, userID, channelID, message, evt) => this.onMessage(user, userID, channelID, message, evt));
+        this.bot.on('message', (message) => this.onMessage(message));
     }
 
     onReady(evt) {
@@ -60,29 +62,27 @@ module.exports = class Hal {
             });
     }
 
-    onMessage(user, userID, channelID, message, evt) {
-        if (message.substring(0, 1) == '!') {
-            let command = this.security.getCommand(message);
+    onMessage(message) {
+        let channelID = message.channel.id;
+        let content = message.content;
+        let users = this.bot.users;
+        let userID = message.author.id;
+
+        if (content.substring(0, 1) == '!') {
+            let command = this.security.getCommand(content);
 
             if (command && this.security.canRunCommand(command, channelID)) {
-                var args = _.filter(message.replace(command.name, '').trim().split(' '), it => it != '');
-
+                var args = _.filter(content.replace(command.name, '').trim().split(' '), it => it != '');
+                
                 switch (command.name) {
                     case '!help':
                         this.sendMessage(new Message(channelID, command.text));
                         break;
                     case '!help trivia':
-                        this.trivia.getTriviaCategories().subscribe(res => {
-                            let message = new Message(channelID, '');
-                            res.forEach(cat => {
-                                message.text += `Use **!trivia ${cat.name}** for *${cat.description}* questions\n`;
-                            });
-                            this.sendMessage(message);
-                        });
+                        this.trivia.getTriviaCategories(channelID);
                         break;
                     case '!cookies':
-                        let message = new Message(channelID, '', command.embed);
-                        this.sendMessage(message);
+                        this.sendMessage(new Message(channelID, new Discord.RichEmbed(command.embed)));
                         break;
                     case '!quote':
                         this.quotes.getQuote(channelID);
@@ -197,7 +197,7 @@ module.exports = class Hal {
                         }
                         break;
                     case '!stats':
-                        this.stats.getRanking(channelID, this.bot.users);
+                        this.stats.getRanking(channelID, users);
                         break;
                     case '!person':
                         if (args.length > 0) {
@@ -244,10 +244,7 @@ module.exports = class Hal {
     }
 
     sendMessage(message) {
-        this.bot.sendMessage({
-            to: message.channelID,
-            message: message.text,
-            embed: message.embed
-        });
+        let channel = this.bot.channels.get(message.channelID);
+        channel.send(message.content);
     }
 }

@@ -1,3 +1,5 @@
+var Discord = require('discord.js');
+
 var winston = require('winston');
 
 const axios = require('axios');
@@ -6,6 +8,7 @@ const monk = require('monk');
 const { Observable, Observer, of } = require('rxjs');
 
 const Question = require('../types/question');
+const Message = require('../types/message');
 const Tournament = require('../types/tournament');
 
 const DBService = require('./db.service');
@@ -21,7 +24,7 @@ module.exports = class TriviaService extends BaseService {
         this.tournament = undefined;
         this.questions_source = [];
 
-        this.getTriviaCategories().subscribe(res => {
+        this.db.getTriviaCategories().subscribe(res => {
             this.categories = res;
             this.setCategoryByName(this.categories[0].name);
         });
@@ -31,11 +34,20 @@ module.exports = class TriviaService extends BaseService {
         return this.db.createTriviaCategories();
     }
 
-    getTriviaCategories() {
+    getTriviaCategories(channelID) {
+        let source$ = undefined;
         if (this.categories)
-            return of(this.categories);
+            source$ = of(this.categories);
         else
-            return this.db.getTriviaCategories();
+            source$ = this.db.getTriviaCategories();
+
+        source$.subscribe(res => {
+            let message = new Message(channelID, '');
+            res.forEach(cat => {
+                message.content += `Use **!trivia ${cat.name}** for *${cat.description}* questions\n`;
+            });
+            if (this.onMessage$) this.onMessage$.next(message);
+        });
     }
 
     // Observable where the questions will be sent

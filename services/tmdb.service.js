@@ -1,3 +1,5 @@
+var Discord = require('discord.js');
+
 var winston = require('winston');
 var moment = require('moment');
 
@@ -55,22 +57,23 @@ module.exports = class TMDBService extends BaseService {
             results.forEach((it, ix) => {
                 let message = new Message(channelID);
 
-                message.text += `**${ix > 0 ? '\n\n' : ''}${it.name}**\n\n`;
-
-                if (it.profile_path)
-                    message.embed = {
-                        'image': {
-                            'url': `https://image.tmdb.org/t/p/w200${it.profile_path}`
-                        }
-                    };
+                message.content += `**${ix > 0 ? '\n\n' : ''}${it.name}**\n\n`;
 
                 it.known_for.forEach((k, kx) => {
-                    message.text += `**${kx > 0 ? '\n' : ''}${k.original_title}**\n`;
+                    message.content += `**${kx > 0 ? '\n' : ''}${k.original_title}**\n`;
                     if (k.overview.trim() != '')
-                        message.text += `\`\`\`${k.overview}\`\`\``;
+                        message.content += `\`\`\`${k.overview}\`\`\``;
                 });
 
                 messages.push(message);
+
+                if (it.profile_path) {
+                    messages.push(new Message(channelID, new Discord.RichEmbed({
+                        'image': {
+                            'url': `https://image.tmdb.org/t/p/w200${it.profile_path}`
+                        }
+                    })));
+                }
             });
 
             this.sendMessages(messages);
@@ -96,26 +99,29 @@ module.exports = class TMDBService extends BaseService {
                     this._getMovie(it.id).pipe(map(it => it.imdb_id)).subscribe(imdb_id => {
                         let message = new Message(channelID);
 
-                        message.text += `**${ix > 0 ? '\n\n' : ''}${it.title}** ${it.title != it.original_title ? '*(' + it.original_title + ')*' : ''}\n`;
+                        message.content += `**${ix > 0 ? '\n\n' : ''}${it.title}** ${it.title != it.original_title ? '*(' + it.original_title + ')*' : ''}\n`;
 
                         if (it.release_date && it.release_date.trim() != '')
-                            message.text += `*${moment(it.release_date).format('MMMM Do YYYY')}*\n`
+                            message.content += `*${moment(it.release_date).format('MMMM Do YYYY')}*\n`
 
                         if (imdb_id.trim() != '')
-                            message.text += `<https://www.imdb.com/title/${imdb_id}>\n\n`;
+                            message.content += `<https://www.imdb.com/title/${imdb_id}>\n\n`;
+
+
+                        if (it.overview.trim() != '')
+                            message.content += `\`\`\`${it.overview}\`\`\`\n\n`;
+
+                        observer.next(message);
+
 
                         if (it.poster_path) {
-                            message.embed = {
+                            observer.next(new Message(channelID, new Discord.RichEmbed({
                                 'image': {
                                     'url': `https://image.tmdb.org/t/p/w200${it.poster_path}`
                                 }
-                            };
+                            })));
                         }
 
-                        if (it.overview.trim() != '')
-                            message.text += `\`\`\`${it.overview}\`\`\`\n\n`;
-
-                        observer.next(message);
                         observer.complete();
                     });
                 }));
@@ -144,22 +150,22 @@ module.exports = class TMDBService extends BaseService {
             results.forEach((it, ix) => {
                 let message = new Message(channelID);
 
-                message.text += `**${ix > 0 ? '\n\n' : ''}${it.name}** ${it.name != it.original_name ? '*(' + it.original_name + ')*' : ''}\n`;
+                message.content += `**${ix > 0 ? '\n\n' : ''}${it.name}** ${it.name != it.original_name ? '*(' + it.original_name + ')*' : ''}\n`;
 
-                message.text += `*${moment(it.first_air_date).format('MMMM Do YYYY')}*\n\n`
+                message.content += `*${moment(it.first_air_date).format('MMMM Do YYYY')}*\n\n`
+
+                if (it.overview.trim() != '')
+                    message.content += `\`\`\`${it.overview}\`\`\`\n\n`;
+
+                messages.push(message);
 
                 if (it.poster_path) {
-                    message.embed = {
+                    messages.push(new Message(channelID, new Discord.RichEmbed({
                         'image': {
                             'url': `https://image.tmdb.org/t/p/w200${it.poster_path}`
                         }
-                    };
+                    })));
                 }
-
-                if (it.overview.trim() != '')
-                    message.text += `\`\`\`${it.overview}\`\`\`\n\n`;
-
-                messages.push(message);
             });
 
             this.sendMessages(messages);
