@@ -21,7 +21,7 @@ module.exports = class QuotesService extends BaseService {
                     console.log(res);
                     let quote = res[0];
 
-                    let message = new Message(channelID, '', new Discord.RichEmbed({
+                    let message = new Message(channelID, new Discord.RichEmbed({
                         color: 3447003,
                         title: quote.author,
                         description: quote.quote
