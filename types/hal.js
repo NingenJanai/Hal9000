@@ -34,9 +34,6 @@ module.exports = class Hal {
         this.quotes = new QuotesService(this.config.MASHAPE);
 
         this.bot = new Discord.Client();
-        //this.bot = new Discord.Client({
-        //    token: this.config.BOT_TOKEN
-        //});
 
         this.bot.login(this.config.BOT_TOKEN);
 

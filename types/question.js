@@ -81,9 +81,9 @@ module.exports = class Question {
 
     message() {
         let message = new Message(this.channelID);
-        message.text = `**QUESTION:** ${this.question}\n`;
+        message.content = `**QUESTION:** ${this.question}\n`;
         this.answers.forEach((it, ix) => {
-            message.text += `\n**${ix + 1}**:   *${it}*`;
+            message.content += `\n**${ix + 1}**:   *${it}*`;
         });
         return message;
     }
