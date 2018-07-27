@@ -33,6 +33,20 @@ module.exports = class TriviaService extends BaseService {
         });
     }
 
+    // Observable where the questions will be sent
+    onQuestion() {
+        return Observable.create(observer => {
+            this.onQuestion$ = observer;
+        });
+    }
+
+    // Observable for when a tournament has finished
+    onTournamentFinished() {
+        return Observable.create(observer => {
+            this.onTournamentFinished$ = observer;
+        });
+    }
+
     createTriviaCategories() {
         return this.db.createTriviaCategories();
     }
@@ -53,13 +67,6 @@ module.exports = class TriviaService extends BaseService {
         });
     }
 
-    // Observable where the questions will be sent
-    onQuestion() {
-        return Observable.create(observer => {
-            this.onQuestion$ = observer;
-        });
-    }
-
     getCategory(name) {
         return _.find(this.categories, it => _.toLower(it.name) == _.toLower(name));
     }
@@ -76,15 +83,13 @@ module.exports = class TriviaService extends BaseService {
         return new_category;
     }
 
-    readyQuestions() {
+    readyQuestions(category_id) {
         return Observable.create(observer => {
-            let url = `${this.baseUrl}amount=50&category=${this.category.id}`;
+            let url = `${this.baseUrl}amount=50&category=${category_id}`;
 
             this.getData(url).subscribe(res => {
                 try {
-                    this.questions_source = res.results;
-
-                    if (observer) observer.next(this.questions_source);
+                    if (observer) observer.next(res.results);
                 } catch (err) {
                     if (observer) {
                         winston.error(err);
@@ -106,7 +111,8 @@ module.exports = class TriviaService extends BaseService {
                     observer.next(new Question(item).setCategoryID(this.category.id));
                 }
                 else {
-                    this.readyQuestions().subscribe(res => {
+                    this.readyQuestions(this.category.id).subscribe(questions => {
+                        this.questions_source = questions;
                         let item = this.questions_source.splice(0, 1)[0];
                         observer.next(new Question(item).setCategoryID(this.category.id));
                     });
@@ -125,6 +131,8 @@ module.exports = class TriviaService extends BaseService {
                 try {
                     if (question) {
                         question.setChannelID(channelID);
+
+                        this.question = question;
 
                         this.db
                             .saveQuestion(question)
@@ -169,15 +177,16 @@ module.exports = class TriviaService extends BaseService {
                         else
                             this.sendMessages([new Message(channelID, `Sorry <@${userID}>. You are **wrong**.`)]);
 
+                        if (this.tournament)
+                            console.log(this.tournament.getUsers().length, this.question.getUsers().length, this.question._id);
+
                         if (this.tournament && !this.tournament.isFinished()) {
                             if (this.tournament.hasQuestionsLeft() && (correct || this.question.getUsers().length == this.tournament.getUsers().length)) {
-                                timer(3000).subscribe(() => {
-                                    this.trivia.getQuestion(channelID);
-                                });
+                                timer(3000).subscribe(() => this.getQuestion(channelID));
                             }
                             else {
                                 this.tournament.finish();
-                                this.stats.getTournamentRanking(channelID, this.tournament._id, this.bot.users);
+                                if (this.onTournamentFinished$) this.onTournamentFinished$.next(this.tournament);
                             }
                         }
                     });
@@ -187,7 +196,7 @@ module.exports = class TriviaService extends BaseService {
         }
     }
 
-    createTournament(channelID, category_name, size_text) {
+    createTournament(channelID, category_name, size_text, userID) {
         if (this.tournament && !this.tournament.isFinished()) {
             this.sendMessages([new Message(channelID, `Currently there's a tournament already running. Please wait for it to finish before starting a new one.`)]);
         } else if (category_name.trim() == '' || size_text.trim() == '') {
@@ -195,25 +204,24 @@ module.exports = class TriviaService extends BaseService {
         } else {
             let errors = [];
 
-            let category = this.setCategoryByName(category_name);
+            let category = this.getCategory(category_name);
             let size = parseInt(size_text);
 
             if (!category) errors.push(`Category **${category_name}** doesn't exist. Use **!help trivia** to see available categories.\n`);
             if (typeof size !== "number" || size < 10 || size > 50) errors.push(`Size **${size_text}** is not a valid size. Min size is 10 and max is 50.\n`);
 
             if (errors.length > 0) {
-                this.sendMessages([new Message(channelID, this.arrayToString(errors))]);
+                this.sendMessages([new Message(channelID, errors.join(' ').trim())]);
             } else {
-                this.readyQuestions().subscribe(questions => {
-                    let tournament = new Tournament(this.category.id, questions.splice(0, size));
+                this.readyQuestions(category.id).subscribe(questions => {
+                    let tournament = new Tournament(category.id, questions.splice(0, size)).setChannelID(channelID);
 
                     this.db.
                         saveTournament(tournament)
                         .subscribe(doc => {
                             this.tournament = tournament.setID(doc._id);
-
-                            this.sendMessages([new Message(channelID, `Tournament will start in 60 seconds. Use **!join tournament** to join.`)]);
-                            this.joinTournament(userID);
+                            this.sendMessages([new Message(channelID, `*${category.description} tournament* will start in 60 seconds. Use **!join tournament** to join.`)]);
+                            if (userID) this.joinTournament(channelID, userID);
 
                             // Tournament starts after 60 seconds
                             timer(60000).subscribe(() => {
@@ -224,7 +232,7 @@ module.exports = class TriviaService extends BaseService {
                                     });
                                 }
                                 else
-                                    this.trivia.startTournament(channelID, this.tournament);
+                                    this.startTournament();
                             });
                         });
                 });
@@ -232,18 +240,20 @@ module.exports = class TriviaService extends BaseService {
         }
     }
 
-    startTournament(channelID, tournament) {
-        this.tournament = tournament.start(channelID);
+    startTournament() {
+        this.tournament.start();
 
-        this.getQuestion(channelID);
+        this.getQuestion(this.tournament.getChannelID());
     }
 
     joinTournament(channelID, userID) {
         if (this.tournament && this.tournament.canJoin(userID)) {
+            this.tournament.join(userID);
+
             this.db
                 .saveTournamentUser(this.tournament._id, userID)
                 .subscribe(doc => {
-                    this.sendMessages([new Message(channelID, `User <@${userID}> has joined the tournament`)]);
+                    this.sendMessages([new Message(channelID, `<@${userID}> has joined the tournament`)]);
                 });
         } else {
             this.sendMessages([new Message(channelID, `Currently there's no tournament running. Use **!tournament** *category* *size* to start a new tournament *(max size is 50)*`)]);

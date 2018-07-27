@@ -83,9 +83,8 @@ module.exports = class Tournament {
         this.users.push(userID);
     }
 
-    start(channelID) {
+    start() {
         this.started = true;
-        this.setChannelID(channelID);
         return this;
     }
 
@@ -98,6 +97,7 @@ module.exports = class Tournament {
     }
 
     hasQuestionsLeft() {
+        console.log('hasQuestionsLeft', this.questions.length);
         return this.questions.length > 0;
     }
 
