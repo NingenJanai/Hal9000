@@ -227,7 +227,7 @@ module.exports = class TriviaService extends BaseService {
                             timer(60000).subscribe(() => {
                                 if (this.tournament.getUsers().length < 2) {
                                     this.cancelTournament(tournament).subscribe(res => {
-                                        this.sendMessages([new Message(channelID, `Not enought players to start the tournament.`)]);
+                                        this.sendMessages([new Message(channelID, `Not enough players to start the tournament.`)]);
                                         this.tournament = undefined;
                                     });
                                 }
