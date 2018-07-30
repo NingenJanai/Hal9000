@@ -78,7 +78,7 @@ module.exports = class TMDBService extends BaseService {
 
                 results.forEach((it, ix) => {
                     details$.push(Observable.create(observer => {
-                        this.getData(`${this.baseUrl}/movie/${id}?api_key=${this.API_KEY}`).pipe(map(it => it.imdb_id)).subscribe(imdb_id => {
+                        this.getData(`${this.baseUrl}/movie/${it.id}?api_key=${this.API_KEY}`).pipe(map(it => it.imdb_id)).subscribe(imdb_id => {
                             let messages = [];
 
                             let message = new Message(channelID);
