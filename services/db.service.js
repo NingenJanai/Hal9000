@@ -1,4 +1,5 @@
 var winston = require('winston');
+var moment = require('moment');
 
 const _ = require('lodash');
 const monk = require('monk');
@@ -211,44 +212,59 @@ module.exports = class DBService {
         });
     }
 
-    getRankingData() {
+    getWeeklyRankingData() {
+        var start = moment().startOf('week').toDate().getTime();
+        var end = moment().endOf('week').toDate().getTime();
+        return this.getRankingData(start, end);
+    }
+
+    getRankingData(start, end) {
         return Observable.create(observer => {
             let db = monk(this.MONGO_DB);
 
             let collection = db.get('questions');
 
-            collection.aggregate([
-                {
-                    $unwind: {
-                        path: "$users",
-                        preserveNullAndEmptyArrays: true
-                    }
-                },
-                {
-                    $project: {
-                        "users.userID": 1,
-                        "users.correct": 1
-                    }
-                },
-                {
+            var operations = [];
+            if (start && end) {
+                operations.push({
                     $match: {
-                        "users.correct": true
+                        "timestamp": { $gte: 1532815200000, $lte: 1532815200000 }
                     }
-                },
-                {
-                    $group: {
-                        _id: "$users.userID",
-                        points: {
-                            $sum: 1
-                        }
-                    }
-                },
-                {
-                    $sort: {
-                        points: -1
+                });
+            }
+
+            operations.push({
+                $unwind: {
+                    path: "$users",
+                    preserveNullAndEmptyArrays: true
+                }
+            });
+            operations.push({
+                $project: {
+                    "users.userID": 1,
+                    "users.correct": 1
+                }
+            });
+            operations.push({
+                $match: {
+                    "users.correct": true
+                }
+            });
+            operations.push({
+                $group: {
+                    _id: "$users.userID",
+                    points: {
+                        $sum: 1
                     }
                 }
-            ])
+            });
+            operations.push({
+                $sort: {
+                    points: -1
+                }
+            });
+
+            collection.aggregate(operations)
                 .then(docs => {
                     observer.next(docs);
                     observer.complete();
