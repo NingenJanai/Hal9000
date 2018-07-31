@@ -213,8 +213,9 @@ module.exports = class DBService {
     }
 
     getWeeklyRankingData() {
-        var start = moment().startOf('week').toDate().getTime();
-        var end = moment().endOf('week').toDate().getTime();
+        var start = moment().startOf('isoWeek').toDate().getTime();
+        var end = moment().endOf('isoWeek').toDate().getTime();
+
         return this.getRankingData(start, end);
     }
 
@@ -228,7 +229,7 @@ module.exports = class DBService {
             if (start && end) {
                 operations.push({
                     $match: {
-                        "timestamp": { $gte: 1532815200000, $lte: 1532815200000 }
+                        "timestamp": { $gte: start, $lte: end }
                     }
                 });
             }
