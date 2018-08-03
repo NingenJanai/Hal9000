@@ -97,7 +97,6 @@ module.exports = class Tournament {
     }
 
     hasQuestionsLeft() {
-        console.log('hasQuestionsLeft', this.questions.length);
         return this.questions.length > 0;
     }
 
@@ -106,7 +105,6 @@ module.exports = class Tournament {
             this.question = this.questions.splice(0, 1)[0];
             return this.question;
         } else {
-            // TOURNAMENT FINISHED
             this.finish();
             return undefined;
         }

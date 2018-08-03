@@ -103,8 +103,10 @@ module.exports = class TriviaService extends BaseService {
     getNextQuestion() {
         // If we are in a tournament we return the next tournament question
         if (this.tournament && this.tournament.isStarted() && !this.tournament.isFinished()) {
+            console.log('getNextQuestion from tournament');
             return of(this.tournament.getQuestion());
         } else {
+            console.log('getNextQuestion no tournament');
             return Observable.create(observer => {
                 if (this.questions_source && this.questions_source.length > 0) {
                     let item = this.questions_source.splice(0, 1)[0];
@@ -127,17 +129,15 @@ module.exports = class TriviaService extends BaseService {
 
     getQuestion(channelID) {
         this.getNextQuestion()
-            .subscribe(question => {
+            .subscribe(res => {
                 try {
-                    if (question) {
-                        question.setChannelID(channelID);
-
-                        this.question = question;
+                    if (res) {
+                        this.question = res.setChannelID(channelID);
 
                         this.db
-                            .saveQuestion(question)
+                            .saveQuestion(res)
                             .subscribe(doc => {
-                                this.question = question.setID(doc._id);
+                                this.question = this.question.setID(doc._id);
 
                                 if (this.onQuestion$) this.onQuestion$.next(this.question);
                             });
@@ -177,12 +177,11 @@ module.exports = class TriviaService extends BaseService {
                         else
                             this.sendMessages([new Message(channelID, `Sorry <@${userID}>. You are **wrong**.`)]);
 
-                        if (this.tournament)
-                            console.log(this.tournament.getUsers().length, this.question.getUsers().length, this.question._id);
-
                         if (this.tournament && !this.tournament.isFinished()) {
-                            if (this.tournament.hasQuestionsLeft() && (correct || this.question.getUsers().length == this.tournament.getUsers().length)) {
-                                timer(3000).subscribe(() => this.getQuestion(channelID));
+                            if (this.tournament.hasQuestionsLeft()) {
+                                if (correct || this.question.getUsers().length == this.tournament.getUsers().length) {
+                                    timer(3000).subscribe(() => this.getQuestion(channelID));
+                                }
                             }
                             else {
                                 this.tournament.finish();
