@@ -175,7 +175,7 @@ module.exports = class TriviaService extends BaseService {
                             this.sendMessages([new Message(channelID, _.random(0, 10) > 3 ? `Congratulations <@${userID}>. You are **correct**!` : `**Lucky guess** <@${userID}>!`)]);
                         }
                         else
-                            this.sendMessages([new Message(channelID, `Sorry <@${userID}>. You are **wrong**.`)]);
+                            this.sendMessages([new Message(channelID, _.random(0, 10) > 3 ? `Sorry <@${userID}>. You are **wrong**.` : `**How could you get that wrong ** <@${userID}>!`)]);
 
                         if (this.tournament && !this.tournament.isFinished()) {
                             if (correct || this.question.getUsers().length == this.tournament.getUsers().length) {
