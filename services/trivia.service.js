@@ -4,7 +4,8 @@ var winston = require('winston');
 
 const _ = require('lodash');
 const monk = require('monk');
-const { Observable, Observer, of, timer } = require('rxjs');
+const { Observable, Observer, of, timer, pipe } = require('rxjs');
+const { take } = require('rxjs/operators');
 
 const Question = require('../types/question');
 const Message = require('../types/message');
@@ -176,14 +177,14 @@ module.exports = class TriviaService extends BaseService {
                             this.sendMessages([new Message(channelID, `Sorry <@${userID}>. You are **wrong**.`)]);
 
                         if (this.tournament && !this.tournament.isFinished()) {
-                            if (this.tournament.hasQuestionsLeft()) {
-                                if (correct || this.question.getUsers().length == this.tournament.getUsers().length) {
-                                    timer(3000).subscribe(() => this.getQuestion(channelID));
+                            if (correct || this.question.getUsers().length == this.tournament.getUsers().length) {
+                                if (this.tournament.hasQuestionsLeft()) {
+                                    timer(5000).pipe(take(1)).subscribe(() => this.getQuestion(channelID));
                                 }
-                            }
-                            else {
-                                this.tournament.finish();
-                                if (this.onTournamentFinished$) this.onTournamentFinished$.next(this.tournament);
+                                else {
+                                    this.tournament.finish();
+                                    if (this.onTournamentFinished$) this.onTournamentFinished$.next(this.tournament);
+                                }
                             }
                         }
                     });
