@@ -171,8 +171,9 @@ module.exports = class TriviaService extends BaseService {
                 this.db
                     .saveAnswer(this.question._id, userID, correct)
                     .subscribe(res => {
-                        if (correct)
-                            this.sendMessages([new Message(channelID, `Congratulations <@${userID}>. You are **correct**!`)]);
+                        if (correct) {
+                            this.sendMessages([new Message(channelID, _.random(0, 10) > 3 ? `Congratulations <@${userID}>. You are **correct**!` : `**Lucky guess** <@${userID}>!`)]);
+                        }
                         else
                             this.sendMessages([new Message(channelID, `Sorry <@${userID}>. You are **wrong**.`)]);
 
