@@ -103,10 +103,8 @@ module.exports = class TriviaService extends BaseService {
     getNextQuestion() {
         // If we are in a tournament we return the next tournament question
         if (this.tournament && this.tournament.isStarted() && !this.tournament.isFinished()) {
-            console.log('getNextQuestion from tournament');
             return of(this.tournament.getQuestion());
         } else {
-            console.log('getNextQuestion no tournament');
             return Observable.create(observer => {
                 if (this.questions_source && this.questions_source.length > 0) {
                     let item = this.questions_source.splice(0, 1)[0];
