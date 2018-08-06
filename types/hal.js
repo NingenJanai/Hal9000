@@ -81,7 +81,7 @@ module.exports = class Hal {
                 var args = _.filter(content.replace(command.name, '').trim().split(' '), it => it != '');
                 let query = args.join(' ').trim();
 
-                switch (command.name) {
+                switch (_.toLower(command.name)) {
                     case '!help':
                         this.sendMessage(new Message(channelID, command.text));
                         break;

@@ -19,7 +19,7 @@ module.exports = class SecurityService {
     getCommand(message) {
         let tmp = _.filter(_.reverse(_.orderBy(this.security, it => it.name.length)), it => _.toLower(message).startsWith(it.name));
 
-        return tmp.length > 0 ? _.toLower(tmp[0]) : undefined;
+        return tmp.length > 0 ? tmp[0] : undefined;
     }
 
     canRunCommand(command, channelID) {
