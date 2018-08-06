@@ -184,7 +184,7 @@ module.exports = class TriviaService extends BaseService {
                                 }
                                 else {
                                     this.tournament.finish();
-                                    if (this.onTournamentFinished$) this.onTournamentFinished$.next(this.tournament);
+                                    if (this.onTournamentFinished$) timer(5000).pipe(take(1)).subscribe(() => this.onTournamentFinished$.next(this.tournament));
                                 }
                             }
                         }
