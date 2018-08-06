@@ -78,10 +78,10 @@ module.exports = class Hal {
             let command = this.security.getCommand(content);
 
             if (command && this.security.canRunCommand(command, channelID)) {
-                var args = _.filter(content.replace(command.name, '').trim().split(' '), it => it != '');
+                var args = _.filter(_.toLower(content).replace(command.name, '').trim().split(' '), it => it != '');
                 let query = args.join(' ').trim();
 
-                switch (_.toLower(command.name)) {
+                switch (command.name) {
                     case '!help':
                         this.sendMessage(new Message(channelID, command.text));
                         break;
