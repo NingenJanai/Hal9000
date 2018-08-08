@@ -86,7 +86,9 @@ module.exports = class TriviaService extends BaseService {
 
     readyQuestions(category_id) {
         return Observable.create(observer => {
-            let url = `${this.baseUrl}amount=50&category=${category_id}`;
+            let amount = 20;
+
+            let url = `${this.baseUrl}amount=${amount}&category=${category_id}`;
 
             this.getData(url).subscribe(res => {
                 try {
