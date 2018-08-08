@@ -1,0 +1,62 @@
+[
+  {
+    "name": "movies",
+    "description": "Movies",
+    "id": 11
+  },
+  {
+    "name": "tv",
+    "description": "TV Shows",
+    "id": 14
+  },
+  {
+    "name": "books",
+    "description": "Books",
+    "id": 10
+  },
+  {
+    "name": "games",
+    "description": "Video games",
+    "id": 15
+  },
+  {
+    "name": "anime",
+    "description": "Anime / Manga",
+    "id": 31
+  },
+  {
+    "name": "comics",
+    "description": "Comics",
+    "id": 29
+  },
+  {
+    "name": "general",
+    "description": "General knowledge",
+    "id": 9
+  },
+  {
+    "name": "geography",
+    "description": "Geography",
+    "id": 22
+  },
+  {
+    "name": "science",
+    "description": "Science & nature",
+    "id": 17
+  },
+  {
+    "name": "history",
+    "description": "History",
+    "id": 23
+  },
+  {
+    "name": "animals",
+    "description": "Animals",
+    "id": 27
+  },
+  {
+    "name": "art",
+    "description": "Art",
+    "id": 25
+  }
+]
