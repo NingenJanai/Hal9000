@@ -27,12 +27,14 @@ module.exports = class DBService {
                         observer.complete();
                     })
                     .catch(err => {
+                        console.log(err);
                         winston.error(err);
                         observer.error(err);
                     })
                     .then(() => db.close());
 
             } catch (err) {
+                console.log(err);
                 winston.error(err);
                 observer.error(err);
             }
