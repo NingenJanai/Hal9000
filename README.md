@@ -18,7 +18,7 @@ The bot will look for its config in a file called hal.config.json or if the file
    "BOT_TOKEN": "YOUR-BOT-TOKEN",
    "MONGO_DB": "MONGO-CONNECTION-STRING",
    "THE_MOVIE_DB": "THE-MOVIE-DB-API-KEY",
-   "MASHAPE": "YOUR-MASHAPE-API-KEY"
+   "MASHAPE": "YOUR-MASHAPE-API-KEY",
    "OMDB": "YOUR-OMDB-API-KEY",
    "IGDB": "YOUR-IGDB-API-KEY"
 }
