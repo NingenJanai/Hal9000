@@ -9,6 +9,7 @@
     "start": "node index.js"
   },
   "dependencies": {
+    "@discordjs/uws": "^10.149.0",
     "axios": "^0.18.0",
     "discord.js": "^11.3.2",
     "html-entities": "^1.2.1",
