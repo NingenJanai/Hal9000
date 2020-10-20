@@ -3,7 +3,6 @@ var Discord = require('discord.js');
 var winston = require('winston');
 
 const _ = require('lodash');
-const monk = require('monk');
 const { Observable, Observer, of, timer, pipe } = require('rxjs');
 const { take } = require('rxjs/operators');
 
