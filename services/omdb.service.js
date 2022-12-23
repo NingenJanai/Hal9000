@@ -1,7 +1,5 @@
 var Discord = require('discord.js');
 
-var winston = require('winston');
-
 const _ = require('lodash');
 
 const Message = require('../types/message');
@@ -55,11 +53,11 @@ module.exports = class OMDBService extends BaseService {
             messages.push(message);
 
             if (movie.Poster) {
-                messages.push(new Message(channelID, new Discord.RichEmbed({
+                messages.push(new Message(channelID, {
                     'image': {
                         'url': `${movie.Poster}`
                     }
-                })));
+                }));
             }
             
             this.sendMessages(messages); 
@@ -91,11 +89,11 @@ module.exports = class OMDBService extends BaseService {
             messages.push(message);
 
             if (show.Poster) {
-                messages.push(new Message(channelID, new Discord.RichEmbed({
+                messages.push(new Message(channelID, {
                     'image': {
                         'url': `${show.Poster}`
                     }
-                })));
+                }));
             }
 
             this.sendMessages(messages);

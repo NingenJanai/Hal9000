@@ -1,7 +1,3 @@
-var Discord = require('discord.js');
-
-var winston = require('winston');
-
 const Message = require('../types/message');
 
 const BaseService = require('./base.service');
@@ -21,11 +17,11 @@ module.exports = class QuotesService extends BaseService {
                     console.log(res);
                     let quote = res[0];
 
-                    let message = new Message(channelID, new Discord.RichEmbed({
+                    let message = new Message(channelID, {
                         color: 3447003,
                         title: quote.author,
                         description: quote.quote
-                    }));
+                    });
 
                     this.onMessage$.next(message);
                 }

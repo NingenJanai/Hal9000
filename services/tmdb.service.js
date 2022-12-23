@@ -1,11 +1,10 @@
 var Discord = require('discord.js');
 
-var winston = require('winston');
 var moment = require('moment');
 
 const _ = require('lodash');
 
-const { Observable, pipe, forkJoin } = require('rxjs');
+const { Observable, forkJoin } = require('rxjs');
 const { map } = require('rxjs/operators');
 
 const Message = require('../types/message');
@@ -49,11 +48,11 @@ module.exports = class TMDBService extends BaseService {
                     messages.push(message);
 
                     if (it.profile_path) {
-                        messages.push(new Message(channelID, new Discord.RichEmbed({
+                        messages.push(new Message(channelID, {
                             'image': {
                                 'url': `https://image.tmdb.org/t/p/w200${it.profile_path}`
                             }
-                        })));
+                        }));
                     }
                 });
 
@@ -77,7 +76,7 @@ module.exports = class TMDBService extends BaseService {
                 var details$ = [];
 
                 results.forEach((it, ix) => {
-                    details$.push(Observable.create(observer => {
+                    details$.push(new Observable(observer => {
                         this.getData(`${this.baseUrl}/movie/${it.id}?api_key=${this.API_KEY}`).pipe(map(it => it.imdb_id)).subscribe(imdb_id => {
                             let messages = [];
 
@@ -96,11 +95,11 @@ module.exports = class TMDBService extends BaseService {
                             messages.push(message);
 
                             if (it.poster_path) {
-                                messages.push(new Message(channelID, new Discord.RichEmbed({
+                                messages.push(new Message(channelID, {
                                     'image': {
                                         'url': `https://image.tmdb.org/t/p/w200${it.poster_path}`
                                     }
-                                })));
+                                }));
                             }
 
                             observer.next(messages);
@@ -143,11 +142,12 @@ module.exports = class TMDBService extends BaseService {
                     messages.push(message);
 
                     if (it.poster_path) {
-                        messages.push(new Message(channelID, new Discord.RichEmbed({
-                            'image': {
-                                'url': `https://image.tmdb.org/t/p/w200${it.poster_path}`
+                        messages.push(new Message(channelID, {
+                            title: 'Poster',
+                            image: {
+                                url: `https://image.tmdb.org/t/p/w200${it.poster_path}`
                             }
-                        })));
+                        }));
                     }
                 });
 

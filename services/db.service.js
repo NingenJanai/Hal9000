@@ -10,7 +10,7 @@ module.exports = class DBService {
         this.MONGO_DB = MONGO_DB;
     }
     createTriviaCategories() {
-        return Observable.create(observer => {
+        return new Observable(observer => {
             try {
                 let categories = require('../trivia.categories.json');
 
@@ -42,7 +42,7 @@ module.exports = class DBService {
     }
 
     getTriviaCategories() {
-        return Observable.create(observer => {
+        return new Observable(observer => {
             MongoClient.connect(this.MONGO_DB, function (err, db) {
                 if (err) throw err;
                 var dbo = db.db("hal");
@@ -58,7 +58,7 @@ module.exports = class DBService {
     }
 
     createCommands() {
-        return Observable.create(observer => {
+        return new Observable(observer => {
             try {
                 let commands = require('../commands.json');
 
@@ -90,7 +90,7 @@ module.exports = class DBService {
     }
 
     getCommands() {
-        return Observable.create(observer => {
+        return new Observable(observer => {
             MongoClient.connect(this.MONGO_DB, function (err, db) {
                 if (err) throw err;
                 var dbo = db.db("hal");
@@ -105,7 +105,7 @@ module.exports = class DBService {
     }
 
     saveTournament(tournament) {
-        return Observable.create(observer => {
+        return new Observable(observer => {
             MongoClient.connect(this.MONGO_DB, function (err, db) {
                 if (err) throw err;
                 var dbo = db.db("hal");
@@ -129,7 +129,7 @@ module.exports = class DBService {
     }
 
     deleteTournament(tournamentID) {
-        return Observable.create(observer => {
+        return new Observable(observer => {
             MongoClient.connect(this.MONGO_DB, function (err, db) {
                 if (err) throw err;
                 var dbo = db.db("hal");
@@ -150,7 +150,7 @@ module.exports = class DBService {
     }
 
     saveTournamentUser(tournamentID, userID) {
-        return Observable.create(observer => {
+        return new Observable(observer => {
             MongoClient.connect(this.MONGO_DB, function (err, db) {
                 if (err) throw err;
                 var dbo = db.db("hal");
@@ -175,7 +175,7 @@ module.exports = class DBService {
     }
 
     saveQuestion(question) {
-        return Observable.create(observer => {
+        return new Observable(observer => {
             MongoClient.connect(this.MONGO_DB, function (err, db) {
                 if (err) throw err;
                 var dbo = db.db("hal");
@@ -196,7 +196,7 @@ module.exports = class DBService {
     }
 
     saveAnswer(questionID, userID, correct) {
-        return Observable.create(observer => {
+        return new Observable(observer => {
             MongoClient.connect(this.MONGO_DB, function (err, db) {
                 if (err) throw err;
                 var dbo = db.db("hal");
@@ -230,7 +230,7 @@ module.exports = class DBService {
     }
 
     getRankingData(start, end) {
-        return Observable.create(observer => {
+        return new Observable(observer => {
             var operations = [];
 
             if (start && end) {
@@ -291,7 +291,7 @@ module.exports = class DBService {
     }
 
     getTournamentRankingData(tournament_id) {
-        return Observable.create(observer => {
+        return new Observable(observer => {
             MongoClient.connect(this.MONGO_DB, function (err, db) {
                 if (err) throw err;
                 var dbo = db.db("hal");

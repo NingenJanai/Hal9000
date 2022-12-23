@@ -1,14 +1,13 @@
-var Discord = require('discord.js');
+const { Client, GatewayIntentBits } = require('discord.js');
 var winston = require('winston');
 
-const { Observable, pipe, timer, merge } = require('rxjs');
+const { merge } = require('rxjs');
 const { throttleTime } = require('rxjs/operators');
 
 const _ = require('lodash');
 
 // Types
 const HalConfig = require('./hal.config');
-const Question = require('./question');
 const Message = require('./message');
 
 // Services
@@ -35,10 +34,17 @@ module.exports = class Hal {
         this.igdb = new IGDBService(this.config.IGDB);
         this.quotes = new QuotesService(this.config.MASHAPE);
 
-        this.bot = new Discord.Client();
+        this.bot = new Client({
+            intents: [
+                GatewayIntentBits.Guilds,
+                GatewayIntentBits.GuildMessages,
+                GatewayIntentBits.MessageContent,
+                GatewayIntentBits.GuildMembers,
+            ],
+        });
 
         this.bot.on('ready', (evt) => this.onReady(evt));
-        this.bot.on('message', (message) => this.onMessage(message));
+        this.bot.on('messageCreate', (message) => this.onMessage(message));
     }
 
     start() {
@@ -69,7 +75,9 @@ module.exports = class Hal {
     }
 
     onMessage(message) {
-        let channelID = message.channel.id;
+        console.log('onMessage', message);
+
+        let channelID = message.channelId;
         let content = message.content;
         let users = this.bot.users;
         let userID = message.author.id;
@@ -89,7 +97,7 @@ module.exports = class Hal {
                         this.trivia.getTriviaHelp(channelID);
                         break;
                     case '!cookies':
-                        this.sendMessage(new Message(channelID, new Discord.RichEmbed(command.embed)));
+                        this.sendMessage(new Message(channelID, command.embed));
                         break;
                     case '!quote':
                         this.quotes.getQuote(channelID);
@@ -147,8 +155,12 @@ module.exports = class Hal {
         }
     };
 
-    sendMessage(message) {
-        let channel = this.bot.channels.get(message.channelID);
-        channel.send(message.content);
+    async sendMessage(message) {
+        console.log('sendMessage', message, message.content);
+        let channel = await this.bot.channels.fetch(message.channelID);
+        if (typeof message.content === 'string' || message.content instanceof String)
+            channel.send(message.content);
+        else
+            channel.send({ embeds: [ message.content] });
     }
 }

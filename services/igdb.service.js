@@ -25,38 +25,7 @@ module.exports = class IGDBService extends BaseService {
                         .subscribe(game => {
                             console.log(game);
                         });
-                });
-                //if (movie.Response != "True") {
-                //    this.sendMessages([new Message(channelID, `No data found for query: **${query}**`)]);
-                //    return;
-                //}
-
-                //let messages = [];
-
-                //let message = new Message(channelID);
-
-                //message.content += `**${movie.Title}**\n`;
-
-                //if (movie.Released)
-                //    message.content += `*${movie.Released}*\n`
-
-                //if (movie.imdbID)
-                //    message.content += `<https://www.imdb.com/title/${movie.imdbID}>\n\n`;
-
-                //if (movie.Plot != '')
-                //    message.content += `\`\`\`${movie.Plot}\`\`\`\n\n`;
-
-                //messages.push(message);
-
-                //if (movie.Poster) {
-                //    messages.push(new Message(channelID, new Discord.RichEmbed({
-                //        'image': {
-                //            'url': `${movie.Poster}`
-                //        }
-                //    })));
-                //}
-            
-                //this.sendMessages(messages); 
+                });              
             });
     }
 }

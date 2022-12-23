@@ -35,14 +35,14 @@ module.exports = class TriviaService extends BaseService {
 
     // Observable where the questions will be sent
     onQuestion() {
-        return Observable.create(observer => {
+        return new Observable(observer => {
             this.onQuestion$ = observer;
         });
     }
 
     // Observable for when a tournament has finished
     onTournamentFinished() {
-        return Observable.create(observer => {
+        return new Observable(observer => {
             this.onTournamentFinished$ = observer;
         });
     }
@@ -84,7 +84,7 @@ module.exports = class TriviaService extends BaseService {
     }
 
     readyQuestions(category_id) {
-        return Observable.create(observer => {
+        return new Observable(observer => {
             let amount = 20;
 
             let url = `${this.baseUrl}amount=${amount}&category=${category_id}`;
@@ -107,7 +107,7 @@ module.exports = class TriviaService extends BaseService {
         if (this.tournament && this.tournament.isStarted() && !this.tournament.isFinished()) {
             return of(this.tournament.getQuestion());
         } else {
-            return Observable.create(observer => {
+            return new Observable(observer => {
                 if (this.questions_source && this.questions_source.length > 0) {
                     let item = this.questions_source.splice(0, 1)[0];
                     observer.next(new Question(item).setCategoryID(this.category.id));

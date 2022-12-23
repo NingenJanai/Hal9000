@@ -4,7 +4,7 @@ const { take } = require('rxjs/operators');
 
 module.exports = class BaseService {
     onMessage() {
-        return Observable.create(observer => {
+        return new Observable(observer => {
             this.onMessage$ = observer;
         });
     }
@@ -16,7 +16,7 @@ module.exports = class BaseService {
     }
 
     getData(url, data) {
-        return Observable.create(observer => {
+        return new Observable(observer => {
             axios.get(url, data)
                 .then(res => {
                     if (observer) {

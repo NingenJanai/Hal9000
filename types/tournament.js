@@ -2,7 +2,6 @@ const _ = require('lodash');
 const Entities = require('html-entities').AllHtmlEntities;
 const entities = new Entities();
 
-const Message = require('./message');
 const Question = require('./question');
 
 module.exports = class Tournament {
