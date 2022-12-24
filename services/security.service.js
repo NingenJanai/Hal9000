@@ -1,5 +1,3 @@
-var winston = require('winston');
-
 const _ = require('lodash');
 
 const DBService = require('./db.service');

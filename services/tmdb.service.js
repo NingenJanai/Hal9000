@@ -1,5 +1,3 @@
-var Discord = require('discord.js');
-
 var moment = require('moment');
 
 const _ = require('lodash');

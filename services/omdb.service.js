@@ -1,5 +1,3 @@
-var Discord = require('discord.js');
-
 const _ = require('lodash');
 
 const Message = require('../types/message');
