@@ -75,8 +75,6 @@ module.exports = class Hal {
     }
 
     onMessage(message) {
-        console.log('onMessage', message);
-
         let channelID = message.channelId;
         let content = message.content;
         let users = this.bot.users;
@@ -156,11 +154,15 @@ module.exports = class Hal {
     };
 
     async sendMessage(message) {
-        console.log('sendMessage', message, message.content);
-        let channel = await this.bot.channels.fetch(message.channelID);
-        if (typeof message.content === 'string' || message.content instanceof String)
-            channel.send(message.content);
-        else
-            channel.send({ embeds: [ message.content] });
+        try {
+            let channel = await this.bot.channels.fetch(message.channelID);
+            if (typeof message.content === 'string' || message.content instanceof String)
+                channel.send(message.content);
+            else
+                channel.send({ embeds: [ message.content] });
+        } catch (err) {
+            console.log(err);
+            winston.error(err);
+        }       
     }
 }

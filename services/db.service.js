@@ -9,6 +9,7 @@ module.exports = class DBService {
     constructor(MONGO_DB) {
         this.MONGO_DB = MONGO_DB;
     }
+    
     createTriviaCategories() {
         return new Observable(observer => {
             try {
@@ -48,7 +49,6 @@ module.exports = class DBService {
                 var dbo = db.db("hal");
                 dbo.collection("trivia_categories").find({}).toArray(function (err, docs) {
                     if (err) throw err;
-                    console.log('trivia_categories', docs);
                     observer.next(docs);
                     observer.complete();
                     db.close();

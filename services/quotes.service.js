@@ -14,7 +14,6 @@ module.exports = class QuotesService extends BaseService {
         this.getData(this.baseUrl, { headers: { 'X-Mashape-Key': this.API_KEY } })
             .subscribe(res => {
                 if (this.onMessage$) {
-                    console.log(res);
                     let quote = res[0];
 
                     let message = new Message(channelID, {
