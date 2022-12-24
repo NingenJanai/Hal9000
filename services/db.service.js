@@ -1,13 +1,15 @@
-var winston = require('winston');
-var moment = require('moment');
+import winston from 'winston';
+import moment from 'moment';
 
-const _ = require('lodash');
-const MongoClient = require('mongodb').MongoClient;
-const { Observable, Observer } = require('rxjs');
+import _ from 'lodash';
+import MongoClient from 'mongodb';
+//const MongoClient = require('mongodb').MongoClient;
+import { Observable } from 'rxjs';
 
-module.exports = class DBService {
+export default class DBService {
     constructor(MONGO_DB) {
         this.MONGO_DB = MONGO_DB;
+        console.log('mdb', this.MONGO_DB);
     }
     
     createTriviaCategories() {

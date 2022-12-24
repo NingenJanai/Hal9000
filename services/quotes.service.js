@@ -1,8 +1,7 @@
-const Message = require('../types/message');
+import Message from '../types/message.js';
+import BaseService from './base.service.js';
 
-const BaseService = require('./base.service');
-
-module.exports = class QuotesService extends BaseService {
+export default class QuotesService extends BaseService {
     constructor(API_KEY) {
         super();
 

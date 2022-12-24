@@ -1,15 +1,14 @@
-var moment = require('moment');
+import moment from 'moment';
 
-const _ = require('lodash');
+import _ from 'lodash';
 
-const { Observable, forkJoin } = require('rxjs');
-const { map } = require('rxjs/operators');
+import { Observable, forkJoin } from 'rxjs';
+import { map } from 'rxjs/operators';
 
-const Message = require('../types/message');
+import Message from '../types/message.js';
+import BaseService from './base.service.js';
 
-const BaseService = require('./base.service');
-
-module.exports = class TMDBService extends BaseService {
+export default class TMDBService extends BaseService {
     constructor(API_KEY) {
         super();
 

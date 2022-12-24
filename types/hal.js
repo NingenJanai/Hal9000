@@ -1,27 +1,28 @@
-const { Client, GatewayIntentBits } = require('discord.js');
-var winston = require('winston');
 
-const { merge } = require('rxjs');
-const { throttleTime } = require('rxjs/operators');
+import { Client, GatewayIntentBits } from 'discord.js';
+import winston from 'winston';
 
-const _ = require('lodash');
+import { merge } from 'rxjs';
+import { throttleTime } from 'rxjs/operators';
+
+import _ from 'lodash';
 
 // Types
-const HalConfig = require('./hal.config');
-const Message = require('./message');
+import HalConfig from './hal.config.js';
+import Message from './message.js';
 
 // Services
-const SecurityService = require('../services/security.service');
-const TriviaService = require('../services/trivia.service');
-const TMDBService = require('../services/tmdb.service');
-const OMDBService = require('../services/omdb.service');
-const IGDBService = require('../services/igdb.service');
-const QuotesService = require('../services/quotes.service');
-const StatsService = require('../services/stats.service');
+import SecurityService from '../services/security.service.js';
+import TriviaService from '../services/trivia.service.js';
+import TMDBService from '../services/tmdb.service.js';
+import OMDBService from '../services/omdb.service.js';
+import IGDBService from '../services/igdb.service.js';
+import QuotesService from '../services/quotes.service.js';
+import StatsService from '../services/stats.service.js';
 
-module.exports = class Hal {
-    constructor() {
-        this.config = new HalConfig();
+export default class Hal { 
+    async init() {
+        this.config = await HalConfig.getConfig();
 
         this.question = undefined;
         this.tournament = undefined;
@@ -47,7 +48,9 @@ module.exports = class Hal {
         this.bot.on('messageCreate', (message) => this.onMessage(message));
     }
 
-    start() {
+    async start() {
+        await this.init();
+        
         this.bot.login(this.config.BOT_TOKEN);
         return this;
     }

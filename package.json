@@ -5,6 +5,7 @@
   "main": "index.js",
   "author": "Tomas Garralaga Camarero",
   "license": "MPL-2.0",
+  "type": "module",
   "scripts": {
     "start": "node index.js"
   },

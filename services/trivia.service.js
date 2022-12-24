@@ -1,17 +1,16 @@
-var winston = require('winston');
+import winston from 'winston';
 
-const _ = require('lodash');
-const { Observable, Observer, of, timer, pipe } = require('rxjs');
-const { take } = require('rxjs/operators');
+import _ from 'lodash';
+import { Observable, of, timer, pipe } from 'rxjs';
+import { take } from 'rxjs/operators';
 
-const Question = require('../types/question');
-const Message = require('../types/message');
-const Tournament = require('../types/tournament');
+import Question from '../types/question.js';
+import Tournament from '../types/tournament.js';
+import Message from '../types/message.js';
+import BaseService from './base.service.js';
+import DBService from './db.service.js';
 
-const DBService = require('./db.service');
-const BaseService = require('./base.service');
-
-module.exports = class TriviaService extends BaseService {
+export default class TriviaService extends BaseService {
     constructor(MONGO_DB) {
         super();
 

@@ -1,8 +1,8 @@
-const _ = require('lodash');
+import _ from 'lodash';
 
-const DBService = require('./db.service');
+import DBService from './db.service.js';
 
-module.exports = class SecurityService {
+export default class SecurityService {
     constructor(MONGO_DB) {
         this.db = new DBService(MONGO_DB);
         this.db.getCommands().subscribe(res => {

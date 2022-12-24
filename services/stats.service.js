@@ -1,11 +1,10 @@
-const _ = require('lodash');
+import _ from 'lodash';
 
-const Message = require('../types/message');
+import Message from '../types/message.js';
+import BaseService from './base.service.js';
+import DBService from './db.service.js';
 
-const BaseService = require('./base.service');
-const DBService = require('./db.service');
-
-module.exports = class StatsService extends BaseService {
+export default class StatsService extends BaseService {
     constructor(MONGO_DB) {
         super();
         this.db = new DBService(MONGO_DB);

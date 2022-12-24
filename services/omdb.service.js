@@ -1,9 +1,9 @@
-const _ = require('lodash');
+import _ from 'lodash';
 
-const Message = require('../types/message');
-const BaseService = require('./base.service');
+import Message from '../types/message.js';
+import BaseService from './base.service.js';
 
-module.exports = class OMDBService extends BaseService {
+export default class OMDBService extends BaseService {
     constructor(API_KEY) {
         super();
 

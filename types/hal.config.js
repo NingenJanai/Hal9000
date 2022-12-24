@@ -1,23 +1,20 @@
-module.exports = class HalConfig {
-    constructor() {
-        try {
-            let hal_config = require('../hal.config.json');
+import fs from 'fs/promises';
 
-            this.BOT_TOKEN = hal_config.BOT_TOKEN;
-            this.CHANNEL_ID_TRIVIA = hal_config.CHANNEL_ID_TRIVIA;
-            this.MONGO_DB = hal_config.MONGO_DB;
-            this.THE_MOVIE_DB = hal_config.THE_MOVIE_DB;
-            this.OMDB = hal_config.OMDB;
-            this.MASHAPE = hal_config.MASHAPE;
-            this.IGDB = hal_config.IGDB;
-        } catch (e) {
-            this.BOT_TOKEN = process.env.BOT_TOKEN;
-            this.CHANNEL_ID_TRIVIA = process.env.CHANNEL_ID_TRIVIA;
-            this.MONGO_DB = process.env.MONGO_DB;
-            this.THE_MOVIE_DB = process.env.THE_MOVIE_DB;
-            this.OMDB = process.env.OMDB;
-            this.MASHAPE = process.env.MASHAPE;
-            this.IGDB = process.env.IGDB;
+export default class HalConfig {
+    static async getConfig() {
+        try {
+            var hal_config = await fs.readFile('./hal.config.json');
+            return JSON.parse(hal_config);
+        } catch {
+            return {
+                BOT_TOKEN : process.env.BOT_TOKEN,
+                CHANNEL_ID_TRIVIA : process.env.CHANNEL_ID_TRIVIA,
+                MONGO_DB : process.env.MONGO_DB,
+                THE_MOVIE_DB : process.env.THE_MOVIE_DB,
+                OMDB : process.env.OMDB,
+                MASHAPE : process.env.MASHAPE,
+                IGDB : process.env.IGDB
+            }
         }
     }
 }

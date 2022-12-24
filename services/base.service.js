@@ -1,8 +1,9 @@
-const axios = require('axios');
-const { Observable, Observer, timer, pipe } = require('rxjs');
-const { take } = require('rxjs/operators');
+import axios from 'axios';
 
-module.exports = class BaseService {
+import { Observable, timer, pipe } from 'rxjs';
+import { take } from 'rxjs/operators';
+
+export default class BaseService {
     onMessage() {
         return new Observable(observer => {
             this.onMessage$ = observer;

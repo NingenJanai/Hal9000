@@ -1,10 +1,10 @@
-const _ = require('lodash');
-const Entities = require('html-entities').AllHtmlEntities;
-const entities = new Entities();
+import _ from 'lodash';
+import { AllHtmlEntities } from 'html-entities';
+const entities = new AllHtmlEntities();
 
-const Message = require('./message');
+import Message from './message.js';
 
-module.exports = class Question {
+export default class Question {
     constructor(data) {
         this._id = undefined;
 

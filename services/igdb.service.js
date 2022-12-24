@@ -1,9 +1,8 @@
-const _ = require('lodash');
+import _ from 'lodash';
 
-const Message = require('../types/message');
-const BaseService = require('./base.service');
+import BaseService from './base.service.js';
 
-module.exports = class IGDBService extends BaseService {
+export default class IGDBService extends BaseService {
     constructor(API_KEY) {
         super();
 

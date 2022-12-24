@@ -1,10 +1,10 @@
-const _ = require('lodash');
-const Entities = require('html-entities').AllHtmlEntities;
-const entities = new Entities();
+import _ from 'lodash';
+import { AllHtmlEntities } from 'html-entities';
+const entities = new AllHtmlEntities();
 
-const Question = require('./question');
+import Question from './question.js';
 
-module.exports = class Tournament {
+export default class Tournament {
     constructor(category_id, questions) {
         this._id = undefined;
 
