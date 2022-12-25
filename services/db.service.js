@@ -9,7 +9,6 @@ import { Observable } from 'rxjs';
 export default class DBService {
     constructor(MONGO_DB) {
         this.MONGO_DB = MONGO_DB;
-        console.log('mdb', this.MONGO_DB);
     }
     
     createTriviaCategories() {

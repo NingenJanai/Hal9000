@@ -58,8 +58,9 @@ export default class TriviaService extends BaseService {
         source$.subscribe(res => {
             let message = new Message(channelID, '');
             res.forEach(cat => {
-                message.content += `Use **!trivia ${cat.name}** for *${cat.description}* questions\n`;
+                message.content += `Use **!trivia ${cat.name}** or **!t ${cat.name}** for *${cat.description}* questions\n`;               
             });
+            message.content += `\nUse **!answer number** or **!a number** to give an answer\n`;
             if (this.onMessage$) this.onMessage$.next(message);
         });
     }

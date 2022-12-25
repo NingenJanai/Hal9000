@@ -104,6 +104,7 @@ export default class Hal {
                         this.quotes.getQuote(channelID);
                         break;
                     case '!trivia':
+                    case '!t':
                         if (this.trivia.tournamentIsRunning()) {
                             this.sendMessage(new Message(channelID, `Currently there's a tournament running. Please wait for it to finish before starting a trivia question.`));
                         } else if(args.length == 0 || (args.length == 1 && this.trivia.setCategoryByName(channelID, args[0]))) {
@@ -117,6 +118,7 @@ export default class Hal {
                         this.trivia.joinTournament(channelID, userID);
                         break;
                     case '!answer':
+                    case '!a':
                         this.trivia.answerQuestion(channelID, args[0], userID);
                         break;
                     case '!stats':
